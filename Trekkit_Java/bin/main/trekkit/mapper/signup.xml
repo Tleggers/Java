@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"file:///C:/Users/Gates/Desktop/Study/JPA/SecurityStudy/src/main/resources/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.security.study.DAO.SignupDao">
+
+	<select id="checkDupId" resultType="_int">
+		Select Count(*) from user where userid = #{userid}
+	</select>
+	
+	<select id="checkDupE" resultType="_int">
+		Select Count(*) from user where email = #{email}
+	</select>
+	
+	<select id="checkDupNickName" resultType="_int">
+		Select Count(*) from user where nickname = #{nickname}
+	</select>
+	
+	<select id="checkDupMobile" resultType="_int">
+		Select Count(*) from user where phonenumber = #{mobile}
+	</select>
+	
+	<insert id="doSignup">
+	    INSERT INTO user (
+	        userid, password, email, name, nickname, birth, phonenumber, gender
+	    )
+	    VALUES (
+	        #{userid}, #{password}, #{email}, #{name}, #{nickname}, #{birth}, #{number}, #{gender}
+	    )
+	</insert>
+
+</mapper>

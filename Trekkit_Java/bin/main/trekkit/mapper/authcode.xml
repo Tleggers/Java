@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"file:///C:/Users/Gates/Desktop/Study/JPA/SecurityStudy/src/main/resources/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.security.study.DAO.AuthCodeDao">
+
+	<delete id="deleteEmail">
+    	Delete from authcode where email = #{email}
+    </delete>
+    
+    <insert id="insertAuthCode" parameterType="com.security.study.DTO.AuthCode">
+        INSERT INTO authcode (email, code)
+        VALUES (#{email}, #{authCode})
+    </insert>
+    
+    <delete id="deleteExpiredCodes">
+    	Delete from authcode where created &lt; NOW() - INTERVAL 3 MINUTE
+    </delete>
+    
+    <select id="verifyCode" resultType="_int">
+        SELECT Count(*) FROM authcode WHERE email=#{email} and code=#{code} AND created >= NOW() - INTERVAL 3 MINUTE
+    </select>
+    
+</mapper>
