@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface AuthCodeDao {
 
-	void deleteEmail(@Param("email") String cleanEmail);
+	void deleteEmail(@Param("email") String cleanEmail); 
 
 	void insertAuthCode(@Param("email") String cleanEmail, @Param("authCode") String authCode);
 

@@ -12,7 +12,7 @@ import com.Trekkit_Java.DAO.SignupDao;
 @Service 
 public class SignupService {
 	
-	@Autowired private SignupDao sd; 
+	@Autowired private SignupDao sd;  
 
 	@Transactional(readOnly = true) // readOnly를 함으로써 불필요한 행위를 안함으로 인해 성능 향상 가능
 	public boolean checkId(String userid) {

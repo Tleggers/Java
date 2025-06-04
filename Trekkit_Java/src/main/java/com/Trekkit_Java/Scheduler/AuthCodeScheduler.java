@@ -11,7 +11,7 @@ import com.Trekkit_Java.DAO.AuthCodeDao;
 @EnableScheduling
 public class AuthCodeScheduler {
 	
-	@Autowired private AuthCodeDao acd;
+	@Autowired private AuthCodeDao acd; 
 	
 	@Scheduled(fixedRate = 60000) // 1분마다 실행
     public void deleteExpiredAuthCodes() {

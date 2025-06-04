@@ -160,7 +160,7 @@ public class SignupController {
 	@PostMapping("/checkDupNickname")
 	public boolean checkDupNickname(@RequestBody Map<String, String> req) {
 		
-		boolean re = false;
+		boolean re = false; 
 		
 		try {
 			String nickname = req.get("nickname");

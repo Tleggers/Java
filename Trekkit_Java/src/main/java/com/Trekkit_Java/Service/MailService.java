@@ -11,7 +11,7 @@ import com.Trekkit_Java.DAO.AuthCodeDao;
 @Service
 public class MailService {
 	
-	@Autowired private AuthCodeDao acd;
+	@Autowired private AuthCodeDao acd; 
 	@Autowired private JavaMailSender mailSender;
 
 	// 팀명 정해지면 넣기
@@ -79,7 +79,7 @@ public class MailService {
 	public boolean checkAuthCode(String cleanEmail, String authcode) {
 		
 		int count = 0; // 맞으면 1 아니면 0
-		boolean re = false;
+		boolean re = false; // 리턴할거
 		
 		try {
 			count = acd.verifyCode(cleanEmail,authcode);

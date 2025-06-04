@@ -10,7 +10,7 @@ public class Validate {
             String phonenumber, String gender) {
 
 		// 아이디: 영문자/숫자 4~16자리
-		if (userid == null || !userid.matches("^[a-zA-Z0-9]{1,16}$")) return false;
+		if (userid == null || !userid.matches("^[a-zA-Z0-9]{1,16}$")) return false; 
 		
 		// 비밀번호: 영문자/숫자/특수문자 8~20자리
 		if (password == null || !password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{1,16}$")) return false;

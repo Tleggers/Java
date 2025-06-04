@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface SignupDao {
 
-	int checkDupId(@Param("userid") String userid);
+	int checkDupId(@Param("userid") String userid); 
 
 	int checkDupE(@Param("email") String email);
 
