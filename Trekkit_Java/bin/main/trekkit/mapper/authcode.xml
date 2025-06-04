@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
-"file:///C:/Users/Gates/Desktop/Study/JPA/SecurityStudy/src/main/resources/dtd/mybatis-3-mapper.dtd">
+"file:///C:/Users/805-02/eclipse-workspace/Java/Trekkit_Java/src/main/resources/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.security.study.DAO.AuthCodeDao">
+<mapper namespace="com.Trekkit_Java.DAO.AuthCodeDao">
 
 	<delete id="deleteEmail">
     	Delete from authcode where email = #{email}
     </delete>
     
-    <insert id="insertAuthCode" parameterType="com.security.study.DTO.AuthCode">
+    <insert id="insertAuthCode" parameterType="com.Trekkit_Java.DTO.AuthCode">
         INSERT INTO authcode (email, code)
         VALUES (#{email}, #{authCode})
     </insert>
