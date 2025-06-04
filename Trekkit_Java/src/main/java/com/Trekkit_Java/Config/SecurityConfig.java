@@ -41,7 +41,7 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",     // 웹 프론트 (React)
-                "*"                          // 플러터 
+                "http://10.0.2.2"            // 플러터 
             )); // 프론트 주소
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(Arrays.asList("*"));

@@ -1,7 +1,5 @@
 package com.Trekkit_Java.DAO;
 
-import java.time.LocalDate;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,10 +17,7 @@ public interface SignupDao {
 	int doSignup(@Param("userid") String cuserid,
 				    @Param("password") String hashedPw,
 				    @Param("email") String cemail, 
-				    @Param("name") String cname, 
 				    @Param("nickname") String cnickname,
-				    @Param("birth") LocalDate birth,
-				    @Param("number") String cnumber,
-				    @Param("gender") String gender);
+				    @Param("image") String imageUrl);
 
 }

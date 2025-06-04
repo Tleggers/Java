@@ -1,7 +1,5 @@
 package com.Trekkit_Java.Service;
 
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -83,46 +81,22 @@ public class SignupService {
 		return re;
 	}
 
-	@Transactional(readOnly = true)
-	public boolean checkDupMobile(String enmobile) {
-		
-		int count = 0; // 아이디가 몇개 존재하는지 저장할 변수
-		boolean re = false; // Controller로 리턴할 변수
-		
-		try {
-			
-			count = sd.checkDupMobile(enmobile);
-			
-			if(count > 0) {
-				re = false;
-			} else {
-				re = true;
-			}
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		return re;
-	}
-
 	@Transactional
-	public String dosignup(String cuserid, String cpassword, String cemail, String cname, String cnickname,
-			LocalDate birth, String cnumber, String gender) {
+	public boolean dosignup(String cuserid, String cpassword, String cemail, String cnickname, String imageUrl) {
 		
-		String returnstr = ""; // Controller로 리턴할 변수
+		boolean returnstr = false; // Controller로 리턴할 변수
 		int fuck = 0; // 성공 횟수
 	    
 	    try {
 	    	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12); // cost값(반복횟수)
 	    	String hashedPw = encoder.encode(cpassword); // 암호화한 비밀번호를 hashedPw에 저장 	
 	    	
-	    	fuck = sd.doSignup(cuserid,hashedPw,cemail,cname,cnickname,birth,cnumber,gender);
+	    	fuck = sd.doSignup(cuserid,hashedPw,cemail,cnickname,imageUrl);
 	    	
 	    	if(fuck == 1) {
-	    		returnstr = "1";
+	    		returnstr = true;
 	    	} else {
-	    		returnstr = "0";
+	    		returnstr = false;
 	    	}
 	    	
 	    } catch(Exception e) {

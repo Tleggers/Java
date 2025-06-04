@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
-"file:///C:/Users/805-02/eclipse-workspace/Java/Trekkit_Java/src/main/resources/dtd/mybatis-3-mapper.dtd">
+"file:///C:/Users/Gates/git/Java/Trekkit_Java/src/main/resources/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.Trekkit_Java.DAO.SignupDao">
 
@@ -21,12 +21,8 @@
 	</select>
 	
 	<insert id="doSignup">
-	    INSERT INTO user (
-	        userid, password, email, name, nickname, birth, phonenumber, gender
-	    )
-	    VALUES (
-	        #{userid}, #{password}, #{email}, #{name}, #{nickname}, #{birth}, #{number}, #{gender}
-	    )
+	    INSERT INTO user ( userid, password, email, nickname, profile )
+	    VALUES ( #{userid}, #{password}, #{email}, #{nickname}, #{image} )
 	</insert>
 
 </mapper>

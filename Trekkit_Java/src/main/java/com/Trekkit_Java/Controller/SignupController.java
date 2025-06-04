@@ -1,19 +1,21 @@
 package com.Trekkit_Java.Controller;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.io.File;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.Trekkit_Java.Service.MailService;
 import com.Trekkit_Java.Service.SignupService;
-import com.Trekkit_Java.Util.FormatPhoneNumber;
 import com.Trekkit_Java.Util.Validate;
 
 @RestController
@@ -25,53 +27,57 @@ public class SignupController {
 	@Autowired private MailService ms;
 	
 	@PostMapping("/dosignup")
-	public String doSignup(@RequestBody Map<String, String> req) {
-		
-		// 정규식 함수가 들어있는 객체
-		Validate val = new Validate(); 
-		
-		String returnstr = "";
-		
-		try {
-			
-			String userid = req.get("id"); 
-			String password = req.get("pw");
-			String email = req.get("email");
-			String name = req.get("username");
-			String nickname = req.get("nickname");
-			String birthStr = req.get("birth");
-			String cbirthStr = birthStr.trim();
-			String phonenumber = req.get("mobile");
-			String gender = req.get("gender");
-			LocalDate birth = null;
-		    if (birthStr != null && !birthStr.isEmpty() && birthStr.matches("^[0-9\\-]+$")) {
-		    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-		    	birth = LocalDate.parse(cbirthStr, formatter);
-		    }
-		    
-		    // 공백 제거 후 정규식 비교 시작
-		    String cuserid = userid.trim();
-		    String cpassword = password.trim();
-		    String cemail = email.trim();
-		    String cname = name.trim();
-		    String cnickname = nickname.trim();
-		    String cnumber = phonenumber.trim();
-		    
-		    // 받아온 데이터 정규식 비교하며 백엔드에서 처리
-		    boolean isValid = val.dateValidate(cuserid, cpassword, cemail, cname, cnickname, birth, cnumber, gender);
-		    
-		    // 정규식 처리가 false면(즉 쓸데 없는게 들어가있으면) 리턴 0 아니면 리턴 1
-		    if(isValid == false) {
-		    	returnstr = "0";
-		    } else {
-		    	returnstr = ss.dosignup(cuserid,cpassword,cemail,cname,cnickname,birth,cnumber,gender);
-		    }
-		    
-		} catch(Exception e) {
-			System.out.println(e);
-		}
-		
-		return returnstr;
+	public ResponseEntity<Boolean> doSignup(
+	    @RequestParam("id") String id,
+	    @RequestParam("pw") String pw,
+	    @RequestParam("email") String email,
+	    @RequestParam("nickname") String nickname,
+	    @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
+	) {
+	    Validate val = new Validate();
+	    
+	    try {
+	        String cuserid = id.trim();
+	        String cpassword = pw.trim();
+	        String cemail = email.trim();
+	        String cnickname = nickname.trim();
+	        
+	        boolean isValid = val.dateValidate(cuserid, cpassword, cemail, cnickname);
+
+	        if (!isValid) {
+	            return ResponseEntity.ok(false); // ❌ 정규식 실패
+	        }
+	        
+	        if(cnickname == null || cnickname.equals("")) {
+	        	cnickname = cuserid;
+	        }
+	
+	        String save = "src/main/resources/static/profile/";
+	        File dir = new File(save);
+	        if (!dir.exists()) {
+	            dir.mkdirs(); // ✅ 디렉토리 없으면 생성
+	        }
+	        
+	        String imageUrl = null;
+	        if (profileImage != null && !profileImage.isEmpty()) {
+	            String fileName = UUID.randomUUID().toString() + "_" + profileImage.getOriginalFilename();
+	            String savePath = System.getProperty("user.dir") + "/src/main/resources/static/profile/" + fileName;
+
+	            File dest = new File(savePath);
+	            profileImage.transferTo(dest);
+
+	            imageUrl = "/profile/" + fileName;
+	        }
+
+	        // 회원가입 처리
+	        boolean success = ss.dosignup(cuserid, cpassword, cemail, cnickname, imageUrl);
+
+	        return ResponseEntity.ok(success); // ✅ true 또는 false 응답
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(500).body(false); // ❌ 서버 에러 시 false
+	    }
 	}
 	
 	@PostMapping("/checkDupid")
@@ -127,6 +133,7 @@ public class SignupController {
 			
 			String email = req.get("email");
 			String cleanEmail = email.trim();
+			
 			if(cleanEmail == null || cleanEmail.equals("") || cleanEmail.matches(".*[^a-zA-Z0-9@._%+-].*")) {}
 			else {
 				ms.sendMail(cleanEmail);
@@ -148,7 +155,12 @@ public class SignupController {
 			String cleanEmail = email.trim();
 			String authcode = req.get("authCode");
 			
-			re = ms.checkAuthCode(cleanEmail, authcode);
+			if(authcode == null || authcode.equals("") || !authcode.matches("[0-9]+")) {
+				return false;
+			} else {
+				re = ms.checkAuthCode(cleanEmail, authcode);
+			}
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -164,34 +176,17 @@ public class SignupController {
 		
 		try {
 			String nickname = req.get("nickname");
-			String cleanNickName = nickname.trim();
-			
-			if(cleanNickName == null || cleanNickName.equals("") || !cleanNickName.matches("^[가-힣a-zA-Z0-9]+$")) {
-				re = false;
+			String cleanNickName = nickname == null ? "" : nickname.trim();
+
+			if (cleanNickName.equals("")) {
+			    // 입력 안 했으면 유효한 값으로 간주 (닉네임은 선택사항)
+			    re = true;
+			} else if (!cleanNickName.matches("^[가-힣a-zA-Z0-9]+$")) {
+			    // 특수문자 등 포함되면 거절
+			    re = false;
 			} else {
-				re = ss.checkDupNick(cleanNickName);
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		return re;
-	}
-	
-	@PostMapping("/checkDupMobile")
-	public boolean checkDupMobile(@RequestBody Map<String, String> req) {
-		
-		boolean re = false;
-		
-		try {
-			String mobile = req.get("mobile");
-			String cleanMobile = mobile.trim();
-			
-			if(cleanMobile == null || cleanMobile.equals("") || cleanMobile.matches(".*[^0-9].*")) {
-				re = false;
-			} else {
-				String enmobile = FormatPhoneNumber.formatPhoneNumber(cleanMobile);
-				re = ss.checkDupMobile(enmobile);
+			    // 중복체크
+			    re = ss.checkDupNick(cleanNickName);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

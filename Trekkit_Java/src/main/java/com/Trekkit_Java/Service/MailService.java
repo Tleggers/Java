@@ -17,7 +17,7 @@ public class MailService {
 	// 팀명 정해지면 넣기
 	@Transactional
 	public void sendMail(String cleanEmail) {
-		
+
 		try {
 			// 1. 기존에 인증번호를 지운다.(혹여나 다른 인증번호랑 헷갈릴 수 있기 때문에)
 			
