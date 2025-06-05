@@ -39,6 +39,10 @@ dependencies {
 	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-security' // Bcrypt
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5' // jwt
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5' // jwt
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // jwt
+	
 }
 
 tasks.named('test') {
