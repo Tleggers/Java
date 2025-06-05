@@ -1,5 +1,7 @@
 package com.Trekkit_Java.Util;
 
+//2025-06-03
+
 public class Validate {
 	
 	// 회원가입 데이터 정규식 처리

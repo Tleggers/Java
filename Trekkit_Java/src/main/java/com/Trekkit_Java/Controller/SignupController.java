@@ -18,6 +18,8 @@ import com.Trekkit_Java.Service.MailService;
 import com.Trekkit_Java.Service.SignupService;
 import com.Trekkit_Java.Util.Validate;
 
+// 2025-06-04 완
+
 @RestController
 @CrossOrigin(origins="http://localhost:3000", allowCredentials="true")
 @RequestMapping("/signup")

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import lombok.Data;
 
+// 2025-06-02 ~ 2025-06-05
+
 @Data
 public class User {
 	

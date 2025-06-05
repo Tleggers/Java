@@ -12,6 +12,8 @@ import com.Trekkit_Java.DAO.LoginDAO;
 import com.Trekkit_Java.DTO.User;
 import com.Trekkit_Java.Util.JwtUtil;
 
+// 2025-06-05 완
+
 @Service
 public class LoginService {
 	

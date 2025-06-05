@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Param;
 
 import com.Trekkit_Java.DTO.User;
 
+// 2025-06-05 완
+
 @Mapper
 public interface LoginDAO {
 

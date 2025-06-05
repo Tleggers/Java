@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.Trekkit_Java.DAO.AuthCodeDao;
 
+// 2025-06-03
+
 @Component
 @EnableScheduling
 public class AuthCodeScheduler {

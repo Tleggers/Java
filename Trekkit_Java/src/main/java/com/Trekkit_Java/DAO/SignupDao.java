@@ -3,6 +3,8 @@ package com.Trekkit_Java.DAO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+// 2025-06-05 완
+
 @Mapper
 public interface SignupDao {
 

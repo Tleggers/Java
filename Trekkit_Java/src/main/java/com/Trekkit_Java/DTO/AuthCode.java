@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import lombok.Data;
 
+// 2025-06-04
+
 @Data
 public class AuthCode {
 	

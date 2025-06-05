@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.Trekkit_Java.Service.LoginService;
 
+// 2025-06-05 해야하는 일
+// 1. 소셜 로그인 구현
+
 @RestController
 @CrossOrigin(origins="http://localhost:3000", allowCredentials="true")
 @RequestMapping("/login")

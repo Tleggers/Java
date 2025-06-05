@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.Trekkit_Java.DAO.AuthCodeDao;
 
+// 2025-06-04
+
 @Service
 public class MailService {
 	
