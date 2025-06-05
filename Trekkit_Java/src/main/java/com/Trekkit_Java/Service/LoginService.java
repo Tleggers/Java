@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.Trekkit_Java.DAO.LoginDAO;
 import com.Trekkit_Java.DTO.User;
@@ -19,6 +20,7 @@ public class LoginService {
 	@Autowired private JwtUtil jwtUtil;
 
 	// 일반 로그인
+	@Transactional(readOnly = true)
 	public Map<String, Object> doLogin(String cleanid, String cleanpw) {
 		
 		try {
@@ -39,7 +41,12 @@ public class LoginService {
             Map<String, Object> result = new HashMap<>();
             result.put("token", token);
             result.put("nickname", user.getNickname());
-            result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // static 경로 포함
+            
+            if(user.getProfile() == null) {
+            	result.put("profile", ""); 
+            } else {
+            	result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // static 경로 포함
+            }
 
             return result;
 	        
