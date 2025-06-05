@@ -11,5 +11,15 @@
 	<select id="findById" resultType="com.Trekkit_Java.DTO.User">
   		SELECT * FROM user WHERE id = #{id}
 	</select>
+	
+	<!-- 이메일로 사용자 찾기 -->
+	<select id="findUserByEmail" parameterType="String" resultType="map">
+	  	SELECT * FROM user WHERE email = #{email}
+	</select>
+	
+	<insert id="insertKakaoUser" parameterType="map">
+		  INSERT INTO user (email, nickname, profile, logintype)
+		  VALUES (#{email}, #{nickname}, #{profile}, #{type})
+	</insert>
 
 </mapper>

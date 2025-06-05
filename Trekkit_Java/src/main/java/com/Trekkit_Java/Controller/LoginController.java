@@ -51,5 +51,29 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
         }
     }
+	
+	@PostMapping("/kakao")
+	public ResponseEntity<?> doKakaoLogin(@RequestBody Map<String, Object> req) {
+		
+		String type = "KAKAO"; // 로그인 타입
+		
+	    try {
+	        String email = (String) req.get("email");
+	        String nickname = (String) req.get("nickname");
+	        String profile = (String) req.get("profile");
+
+	        if (email == null || nickname == null || profile == null) {
+	            return ResponseEntity.badRequest().body("필수 항목 누락");
+	        }
+
+	        Map<String, Object> result = ls.doKakaoLogin(email, nickname, profile,type);
+
+	        return ResponseEntity.ok(result);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(500).body("서버 오류 발생");
+	    }
+	}
 
 }

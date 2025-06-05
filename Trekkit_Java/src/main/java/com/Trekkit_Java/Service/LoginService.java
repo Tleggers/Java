@@ -60,4 +60,50 @@ public class LoginService {
 		
 	}
 
+	// 카카오 로그인
+	@Transactional
+	public Map<String, Object> doKakaoLogin(String email, String nickname, String profile, String type) {
+		
+		int check = 0; // 회원가입 성공 여부
+		
+	    try {
+	        // ✅ DB에 유저 존재 여부 확인 (소셜 로그인은 이메일 기준)
+	        Map<String, Object> who = ld.findUserByEmail(email);
+
+	        if (who == null) {
+	            // 없으면 회원가입 처리
+	        	check = ld.insertKakaoUser(email, nickname, profile,type);
+	        	
+	        	// 회원가입이 실패하면 return null;
+	        	if(check != 1) {
+	        		return null;
+	        	}
+	        }
+	        
+	        // 이메일로 유저 찾기
+	        User user = ld.findIdByEmail(email);
+	        
+	        // ✅ JWT 발급
+	        String token = jwtUtil.generateToken(user.getId());
+
+	        // ✅ 닉네임, 프로필도 포함해서 리턴
+	        Map<String, Object> result = new HashMap<>();
+	        result.put("token", token);
+	        result.put("nickname", user.getNickname());
+
+	        if(user.getProfile() == null) {
+            	result.put("profile", ""); 
+            } else {
+            	result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // static 경로 포함
+            }
+
+	        return result;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	    
+	}
+
 }
