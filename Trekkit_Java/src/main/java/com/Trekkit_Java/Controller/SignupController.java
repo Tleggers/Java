@@ -21,7 +21,11 @@ import com.Trekkit_Java.Util.Validate;
 // 2025-06-04 완
 
 @RestController
-@CrossOrigin(origins="http://localhost:3000", allowCredentials="true")
+@CrossOrigin(origins = {
+					        "http://localhost:3000",           // 로컬 테스트용
+					        "http://192.168.0.7:3000"          // 실기기 (같은 와이파이 IP)
+							}, 
+				allowCredentials="true")
 @RequestMapping("/signup")
 public class SignupController {
 	

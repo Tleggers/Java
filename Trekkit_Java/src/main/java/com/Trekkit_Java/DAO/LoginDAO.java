@@ -16,11 +16,11 @@ public interface LoginDAO {
 
 	User findById(@Param("id") long id);
 
-	Map<String, Object> findUserByEmail(@Param("email") String email);
+	Map<String, Object> findUserByAuthId(@Param("authid") String authid, @Param("type") String type);
 
-	int insertKakaoUser(@Param("email") String email,@Param("nickname") String nickname,
+	int insertKakaoUser(@Param("authid") String authid,@Param("nickname") String nickname,
 							@Param("profile") String profile,@Param("type") String type);
 
-	User findIdByEmail(@Param("email") String email);
+	User findIdByAuthid(@Param("authid") String authid,@Param("type") String type);
 
 }

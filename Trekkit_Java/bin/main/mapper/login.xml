@@ -12,14 +12,18 @@
   		SELECT * FROM user WHERE id = #{id}
 	</select>
 	
-	<!-- 이메일로 사용자 찾기 -->
-	<select id="findUserByEmail" parameterType="String" resultType="map">
-	  	SELECT * FROM user WHERE email = #{email}
+	<!-- 고유 아이디와 타입으로 사용자 찾기 -->
+	<select id="findUserByAuthId" parameterType="String" resultType="map">
+	  	SELECT * FROM user WHERE oauthid = #{authid} and logintype = #{type}
 	</select>
 	
 	<insert id="insertKakaoUser" parameterType="map">
-		  INSERT INTO user (email, nickname, profile, logintype)
-		  VALUES (#{email}, #{nickname}, #{profile}, #{type})
+		  INSERT INTO user (oauthid, nickname, profile, logintype)
+		  VALUES (#{authid}, #{nickname}, #{profile}, #{type})
 	</insert>
+	
+	<select id="findIdByAuthid" resultType="com.Trekkit_Java.DTO.User">
+		  SELECT * FROM user WHERE oauthid = #{authid} AND logintype = #{type}
+	</select>
 
 </mapper>

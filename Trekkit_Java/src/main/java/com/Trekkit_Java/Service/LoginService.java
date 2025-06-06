@@ -43,6 +43,7 @@ public class LoginService {
             Map<String, Object> result = new HashMap<>();
             result.put("token", token);
             result.put("nickname", user.getNickname());
+            result.put("logintype", user.getLogintype());
             
             if(user.getProfile() == null) {
             	result.put("profile", ""); 
@@ -60,19 +61,19 @@ public class LoginService {
 		
 	}
 
-	// 카카오 로그인
+     //	카카오 로그인
 	@Transactional
-	public Map<String, Object> doKakaoLogin(String email, String nickname, String profile, String type) {
+	public Map<String, Object> doKakaoLogin(String authid,String nickname, String profile, String type) {
 		
 		int check = 0; // 회원가입 성공 여부
 		
 	    try {
 	        // ✅ DB에 유저 존재 여부 확인 (소셜 로그인은 이메일 기준)
-	        Map<String, Object> who = ld.findUserByEmail(email);
+	        Map<String, Object> who = ld.findUserByAuthId(authid, type);
 
 	        if (who == null) {
 	            // 없으면 회원가입 처리
-	        	check = ld.insertKakaoUser(email, nickname, profile,type);
+	        	check = ld.insertKakaoUser(authid, nickname, profile,type);
 	        	
 	        	// 회원가입이 실패하면 return null;
 	        	if(check != 1) {
@@ -81,7 +82,7 @@ public class LoginService {
 	        }
 	        
 	        // 이메일로 유저 찾기
-	        User user = ld.findIdByEmail(email);
+	        User user = ld.findIdByAuthid(authid,type);
 	        
 	        // ✅ JWT 발급
 	        String token = jwtUtil.generateToken(user.getId());
@@ -90,6 +91,7 @@ public class LoginService {
 	        Map<String, Object> result = new HashMap<>();
 	        result.put("token", token);
 	        result.put("nickname", user.getNickname());
+	        result.put("logintype", user.getLogintype());
 
 	        if(user.getProfile() == null) {
             	result.put("profile", ""); 

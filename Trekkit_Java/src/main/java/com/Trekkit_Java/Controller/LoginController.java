@@ -17,7 +17,11 @@ import com.Trekkit_Java.Service.LoginService;
 // 1. 소셜 로그인 구현
 
 @RestController
-@CrossOrigin(origins="http://localhost:3000", allowCredentials="true")
+@CrossOrigin(origins = {
+					        "http://localhost:3000",           // 로컬 테스트용
+					        "http://192.168.0.7:3000"          // 실기기 (같은 와이파이 IP)
+							}, 
+				allowCredentials="true")
 @RequestMapping("/login")
 public class LoginController {
 	
@@ -58,15 +62,20 @@ public class LoginController {
 		String type = "KAKAO"; // 로그인 타입
 		
 	    try {
-	        String email = (String) req.get("email");
 	        String nickname = (String) req.get("nickname");
 	        String profile = (String) req.get("profile");
+	        String authid = String.valueOf(req.get("userid")); // 회원 아이디
+	        
+	        System.out.println("userid: " + authid);
+	        System.out.println("nickname: " + nickname);
+	        System.out.println("profile: " + profile);
+	        System.out.println("type: " + type);
 
-	        if (email == null || nickname == null || profile == null) {
+	        if (authid == null || nickname == null || profile == null) {
 	            return ResponseEntity.badRequest().body("필수 항목 누락");
 	        }
 
-	        Map<String, Object> result = ls.doKakaoLogin(email, nickname, profile,type);
+	        Map<String, Object> result = ls.doKakaoLogin(authid ,nickname, profile,type);
 
 	        return ResponseEntity.ok(result);
 
