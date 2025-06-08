@@ -48,7 +48,8 @@ public class LoginService {
             if(user.getProfile() == null) {
             	result.put("profile", ""); 
             } else {
-            	result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // static 경로 포함
+//            	result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // static 경로 포함, 에뮬레이터
+            	result.put("profile", "http://192.168.0.7:30000" + user.getProfile()); // 실제 기기
             }
 
             return result;
@@ -92,12 +93,16 @@ public class LoginService {
 	        result.put("token", token);
 	        result.put("nickname", user.getNickname());
 	        result.put("logintype", user.getLogintype());
+	        result.put("index", user.getId());
 
-	        if(user.getProfile() == null) {
-            	result.put("profile", ""); 
-            } else {
-            	result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // static 경로 포함
-            }
+	        if (user.getProfile() == null || user.getProfile().isEmpty()) {
+	            result.put("profile", ""); 
+	        } else if (user.getProfile().startsWith("http")) {
+	            result.put("profile", user.getProfile()); // 이미 URL이면 그대로 사용
+	        } else {
+//	            result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // 에뮬레이터
+	            result.put("profile", "http://192.168.0.7:30000" + user.getProfile()); // 실제 기기
+	        }
 
 	        return result;
 

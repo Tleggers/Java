@@ -49,7 +49,7 @@ public class SignupController {
 	        String cnickname = nickname.trim();
 	        
 	        boolean isValid = val.dateValidate(cuserid, cpassword, cemail, cnickname);
-
+	        
 	        if (!isValid) {
 	            return ResponseEntity.ok(false); // ❌ 정규식 실패
 	        }

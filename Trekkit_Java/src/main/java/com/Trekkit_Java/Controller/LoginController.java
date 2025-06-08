@@ -56,20 +56,14 @@ public class LoginController {
         }
     }
 	
-	@PostMapping("/kakao")
+	@PostMapping("/sociallogin")
 	public ResponseEntity<?> doKakaoLogin(@RequestBody Map<String, Object> req) {
-		
-		String type = "KAKAO"; // 로그인 타입
-		
+
 	    try {
 	        String nickname = (String) req.get("nickname");
 	        String profile = (String) req.get("profile");
 	        String authid = String.valueOf(req.get("userid")); // 회원 아이디
-	        
-	        System.out.println("userid: " + authid);
-	        System.out.println("nickname: " + nickname);
-	        System.out.println("profile: " + profile);
-	        System.out.println("type: " + type);
+	        String type = (String) req.get("type");
 
 	        if (authid == null || nickname == null || profile == null) {
 	            return ResponseEntity.badRequest().body("필수 항목 누락");
