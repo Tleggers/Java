@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.Trekkit_Java.Service.FileUploadService;
 import com.Trekkit_Java.Service.PostService;
 
 import model.Post;
+import repository.FileUploadService;
 
 @RestController
 @RequestMapping("/api/posts")
