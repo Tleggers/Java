@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<resultMap id="yourResultMap" type="YourEntity">
-    <result property="stringList" column="string_list" 
-            typeHandler="com.yourcompany.yourproject.config.mybatis.handler.ListTypeHandler"/>
-</resultMap>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "file:///C:\Users\805-02\eclipse-workspace\Java\Trekkit_Java\src\main\resources\dtd\mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Trekkit_Java.DAO.StepDAO">
+
+ <!-- 일별 INSERT OR UPDATE -->
+    <insert id="insertOrUpdateStep" parameterType="Step">
+        INSERT INTO step (user_id, walk_date, distance)
+        VALUES (#{userId}, #{walkDate}, #{distance})
+        ON DUPLICATE KEY UPDATE distance = #{distance}, updated = NOW()
+    </insert>
+
+    <!-- 월별 INSERT OR UPDATE -->
+    <insert id="insertOrUpdateMonthly" parameterType="StepMonthly">
+        INSERT INTO step_monthly (user_id, month, total_distance)
+        VALUES (#{userId}, #{month}, #{totalDistance})
+        ON DUPLICATE KEY UPDATE total_distance = #{totalDistance}, updated = NOW()
+    </insert>
+
+    <select id="selectStepByUserIdAndDate" resultType="Step">
+        SELECT * FROM step WHERE user_id = #{userId} AND walk_date = #{walkDate}
+    </select>
+
+    <select id="selectMonthlyByUserIdAndMonth" resultType="StepMonthly">
+        SELECT * FROM step_monthly WHERE user_id = #{userId} AND month = #{month}
+    </select>
+</mapper>

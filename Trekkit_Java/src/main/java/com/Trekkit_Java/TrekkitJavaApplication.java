@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("com.Trekkit_Java.DAO")
+@MapperScan(basePackages = "com.Trekkit_Java.repository")
 public class TrekkitJavaApplication {
 
 	public static void main(String[] args) {
