@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class LoginService {
 	@Autowired private LoginDAO ld;
 	@Autowired private PasswordEncoder passwordEncoder;
 	@Autowired private JwtUtil jwtUtil;
+	@Value("${app.api.url}") private String apiUrl;
 
 	// 일반 로그인
 	@Transactional(readOnly = true)
@@ -49,9 +51,7 @@ public class LoginService {
             if(user.getProfile() == null) {
             	result.put("profile", ""); 
             } else {
-//            	result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // static 경로 포함, 에뮬레이터
-//            	result.put("profile", "http://192.168.0.7:30000" + user.getProfile()); // 실제 기기1
-            	result.put("profile", "http://192.168.0.51:30000" + user.getProfile()); // 실제 기기2
+            	result.put("profile", apiUrl + user.getProfile());
             }
 
             return result;
@@ -102,9 +102,7 @@ public class LoginService {
 	        } else if (user.getProfile().startsWith("http")) {
 	            result.put("profile", user.getProfile()); // 이미 URL이면 그대로 사용
 	        } else {
-//	            result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // 에뮬레이터
-//	            result.put("profile", "http://192.168.0.7:30000" + user.getProfile()); // 실제 기기
-	            result.put("profile", "http://192.168.0.51:30000" + user.getProfile()); // 실제 기기2
+	        	result.put("profile", apiUrl + user.getProfile());
 	        }
 
 	        return result;

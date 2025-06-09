@@ -1,7 +1,9 @@
 package com.Trekkit_Java.Config;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +21,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	 @Value("${cors.allowed-origins}")
+	 private String allowedOrigins;
 	
 	// CSRF설정
 	@Bean
@@ -43,11 +48,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",     // 웹 프론트 (React)
-                "http://10.0.2.2",           // 플러터 
-                "http://192.168.0.7:3000" // 실제 기기 
-            )); // 프론트 주소
+        // ✅ properties에서 불러온 문자열을 List<String>으로 변환
+        List<String> origins = Arrays.asList(allowedOrigins.split(","));
+        config.setAllowedOrigins(origins);
+        
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true); // 쿠키/인증 정보 허용
@@ -56,6 +60,8 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/signup/**", config); // 회원가입
         source.registerCorsConfiguration("/login/**", config); // 로그인
+        source.registerCorsConfiguration("/find/**", config); // 아이디 비밀번호 찾기
+        source.registerCorsConfiguration("/step/**", config); // 기쁨이꺼
 
         return source;
     }

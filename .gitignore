@@ -3,3 +3,37 @@
 /Trekkit_Java/.gradle
 /Trekkit_Java/.gradle
 /Trekkit_Java/build
+
+# Java 기본
+*.class
+*.log
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Maven/Gradle
+target/
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# 설정 파일
+application.properties
+application.yml
+application-dev.*
+application-prod.*
+.env
+
+# 인증서/키 파일
+*.jks
+*.p12
+*.pem
+*.key
+*.keystore
+
