@@ -37,7 +37,7 @@ public class MailService {
             	    + "----------------------------------\n"
             	    + "📌 인증 코드: " + authCode + "\n"
             	    + "----------------------------------\n\n"
-            	    + "해당 인증 코드는 보안을 위해 5분간만 유효합니다.\n"
+            	    + "해당 인증 코드는 보안을 위해 3분간만 유효합니다.\n"
             	    + "만약 본인이 요청하지 않은 경우 이 이메일을 무시해 주세요.\n\n"
             	    + "감사합니다.\n"
             	    + "- [Trek Kit] 드림 -\n\n"
@@ -48,7 +48,7 @@ public class MailService {
             	    + "----------------------------------\n"
             	    + "📌 Verification Code: " + authCode + "\n"
             	    + "----------------------------------\n\n"
-            	    + "This verification code is valid for 5 minutes for security reasons.\n"
+            	    + "This verification code is valid for 3 minutes for security reasons.\n"
             	    + "If you did not request this email, please disregard it.\n\n"
             	    + "Thank you.\n"
             	    + "- From [Trek Kit]\n\n"
@@ -95,6 +95,61 @@ public class MailService {
 		}
 		
 		return re;
+	}
+
+	@Transactional
+	public void sendFindMail(String cleanEmail) {
+
+		try {
+			// 1. 기존에 인증번호를 지운다.(혹여나 다른 인증번호랑 헷갈릴 수 있기 때문에)
+			
+			acd.deleteEmail(cleanEmail);
+			
+			// 2. 인증 코드 생성
+            String authCode = generateCode();
+            
+            // 3. 이메일 발송
+            SimpleMailMessage message = new SimpleMailMessage();
+            String mailText = ""
+            	    + "안녕하세요.\n\n"
+            	    + "Trek Kit 계정 찾기를 요청하셨습니다.\n"
+            	    + "아래 인증 코드를 입력하시면 요청하신 본인 확인이 완료됩니다.\n\n"
+            	    + "----------------------------------\n"
+            	    + "📌 인증 코드: " + authCode + "\n"
+            	    + "----------------------------------\n\n"
+            	    + "해당 인증 코드는 보안을 위해 3분간만 유효합니다.\n"
+            	    + "본인이 요청하지 않으신 경우, 이 이메일은 무시해 주세요.\n\n"
+            	    + "감사합니다.\n"
+            	    + "- Trek Kit 드림 -\n\n"
+            	    + "==================================\n\n"
+            	    + "Hello,\n\n"
+            	    + "You requested to recover your Trek Kit account.\n"
+            	    + "Please enter the verification code below to proceed.\n\n"
+            	    + "----------------------------------\n"
+            	    + "📌 Verification Code: " + authCode + "\n"
+            	    + "----------------------------------\n\n"
+            	    + "This code is valid for 3 minutes for security reasons.\n"
+            	    + "If you did not request this, please ignore this email.\n\n"
+            	    + "Thank you.\n"
+            	    + "- Trek Kit Team -\n\n"
+            	    + "───────────────────────────────────────\n"
+            	    + "ⓒ 2025 Trek Kit. All rights reserved.\n"
+            	    + "고객센터: support@trekkit.com | 010-1234-5678\n"
+            	    + "주소: 서울 서초구 서초동 1318-2  8층\n"
+            	    + "───────────────────────────────────────";
+            
+            message.setTo(cleanEmail);
+            message.setSubject("[이메일 인증] 인증 코드 발송");
+            message.setText(mailText);
+            mailSender.send(message);
+            
+            // 4. DB 저장
+            acd.insertAuthCode(cleanEmail,authCode);
+            
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

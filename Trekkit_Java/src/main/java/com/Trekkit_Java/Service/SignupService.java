@@ -108,4 +108,15 @@ public class SignupService {
 		return returnstr;
 	}
 
+	@Transactional(readOnly = true)
+	public boolean checkUserByIdAndEmail(String cleanUserid, String cleanEmail) {
+		
+		try {
+			return sd.existsByIdAndEmail(cleanUserid, cleanEmail) > 0;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 }

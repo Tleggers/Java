@@ -157,6 +157,63 @@ public class SignupController {
 		
 	}
 	
+	@PostMapping("/sendFindMail") 
+	public void sendFindMail(@RequestBody Map<String, String> req) {
+		
+		try {
+			
+			String email = req.get("email");
+			String cleanEmail = email.trim();
+			
+			if(cleanEmail == null || cleanEmail.equals("") || cleanEmail.matches(".*[^a-zA-Z0-9@._%+-].*")) {}
+			else {
+				ms.sendFindMail(cleanEmail);
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	@PostMapping("/sendFindPwMail")
+	public ResponseEntity<String> sendFindPwMail(@RequestBody Map<String, String> req) {
+		
+	    try {
+	        String email = req.get("email");
+	        String userid = req.get("userid");
+
+	        if (email == null || userid == null) {
+	            return ResponseEntity.badRequest().body("입력값이 부족합니다.");
+	        }
+
+	        String cleanEmail = email.trim();
+	        String cleanUserid = userid.trim();
+
+	        // 형식 검증
+	        if (cleanEmail.equals("") || cleanUserid.equals("") ||
+	            cleanEmail.matches(".*[^a-zA-Z0-9@._%+-].*") ||
+	            cleanUserid.matches(".*[^a-zA-Z0-9].*")) {
+	            return ResponseEntity.badRequest().body("형식이 올바르지 않습니다.");
+	        }
+
+	        // 유저 존재 여부 확인
+	        boolean userExists = ss.checkUserByIdAndEmail(cleanUserid, cleanEmail);
+	        if (!userExists) {
+	            return ResponseEntity.status(404).body("해당 유저를 찾을 수 없습니다.");
+	        }
+
+	        // 메일 전송
+	        ms.sendFindMail(cleanEmail);
+	        return ResponseEntity.ok("메일 전송 완료");
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(500).body("서버 오류");
+	    }
+	    
+	}
+	
 	@PostMapping("/checkAuthCode")
 	public boolean checkAuthCode(@RequestBody Map<String, String> req) {
 		

@@ -22,4 +22,6 @@ public interface SignupDao {
 				    @Param("nickname") String cnickname,
 				    @Param("image") String imageUrl);
 
+	int existsByIdAndEmail(@Param("userid") String userid, @Param("email") String email);
+
 }

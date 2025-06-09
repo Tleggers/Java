@@ -24,5 +24,9 @@
 	    INSERT INTO user ( userid, password, email, nickname, profile )
 	    VALUES ( #{userid}, #{password}, #{email}, #{nickname}, #{image} )
 	</insert>
+	
+	<select id="existsByIdAndEmail" resultType="int">
+        SELECT COUNT(*) FROM user WHERE userid = #{userid} AND email = #{email}
+    </select>
 
 </mapper>
