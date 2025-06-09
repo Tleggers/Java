@@ -30,11 +30,11 @@ public class LoginService {
 			// 유저 id 조회
 			Long id = ld.findByUserid(cleanid);
 			if (id == null) return null;  // 아이디 없으면 return null;
-			
+
 			// 유저 정보 조회
             User user = ld.findById(id);
             if (user == null) return null; // 유저 없음
-			
+
             // 비밀번호 일치 여부 확인
             if (!passwordEncoder.matches(cleanpw, user.getPassword())) return null;
 
@@ -44,12 +44,14 @@ public class LoginService {
             result.put("token", token);
             result.put("nickname", user.getNickname());
             result.put("logintype", user.getLogintype());
+            result.put("index", user.getId());
             
             if(user.getProfile() == null) {
             	result.put("profile", ""); 
             } else {
 //            	result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // static 경로 포함, 에뮬레이터
-            	result.put("profile", "http://192.168.0.7:30000" + user.getProfile()); // 실제 기기
+//            	result.put("profile", "http://192.168.0.7:30000" + user.getProfile()); // 실제 기기1
+            	result.put("profile", "http://192.168.0.51:30000" + user.getProfile()); // 실제 기기2
             }
 
             return result;
@@ -101,7 +103,8 @@ public class LoginService {
 	            result.put("profile", user.getProfile()); // 이미 URL이면 그대로 사용
 	        } else {
 //	            result.put("profile", "http://10.0.2.2:30000" + user.getProfile()); // 에뮬레이터
-	            result.put("profile", "http://192.168.0.7:30000" + user.getProfile()); // 실제 기기
+//	            result.put("profile", "http://192.168.0.7:30000" + user.getProfile()); // 실제 기기
+	            result.put("profile", "http://192.168.0.51:30000" + user.getProfile()); // 실제 기기2
 	        }
 
 	        return result;

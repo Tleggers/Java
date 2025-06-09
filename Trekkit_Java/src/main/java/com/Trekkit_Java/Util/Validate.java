@@ -8,10 +8,10 @@ public class Validate {
 	public boolean dateValidate(String userid, String password, String email, String nickname) {
 
 		// 아이디: 영문자/숫자 1~16자리
-		if (userid == null || !userid.matches("^[a-zA-Z0-9]{1,16}$")) return false; 
+		if (userid == null || !userid.matches("^[a-zA-Z0-9]{1,16}$") || userid.equals("admin")) return false; 
 		
 		// 비밀번호: 영문자/숫자/특수문자 1~16자리
-		if (password == null || !password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{1,16}$")) return false;
+		if (password == null || !password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{1,16}$") || password.equals("admin")) return false;
 		
 		// 이메일: 형식 체크
 		if (email == null || !email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) return false;

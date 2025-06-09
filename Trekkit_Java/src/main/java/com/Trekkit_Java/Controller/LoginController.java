@@ -19,7 +19,8 @@ import com.Trekkit_Java.Service.LoginService;
 @RestController
 @CrossOrigin(origins = {
 					        "http://localhost:3000",           // 로컬 테스트용
-					        "http://192.168.0.7:3000"          // 실기기 (같은 와이파이 IP)
+					        "http://192.168.0.7:3000" ,     // 실기기1
+					        "http://192.168.0.51:3000"      // 실기기2
 							}, 
 				allowCredentials="true")
 @RequestMapping("/login")

@@ -23,7 +23,8 @@ import com.Trekkit_Java.Util.Validate;
 @RestController
 @CrossOrigin(origins = {
 					        "http://localhost:3000",           // 로컬 테스트용
-					        "http://192.168.0.7:3000"          // 실기기 (같은 와이파이 IP)
+					        "http://192.168.0.7:3000",      // 실기기 (같은 와이파이 IP)
+					        "http://192.168.0.51:3000"     // 실기기2
 							}, 
 				allowCredentials="true")
 @RequestMapping("/signup")
@@ -57,22 +58,27 @@ public class SignupController {
 	        if(cnickname == null || cnickname.equals("")) {
 	        	cnickname = cuserid;
 	        }
-	
-	        String save = "src/main/resources/static/profile/";
-	        File dir = new File(save);
-	        if (!dir.exists()) {
-	            dir.mkdirs(); // ✅ 디렉토리 없으면 생성
-	        }
 	        
 	        String imageUrl = null;
 	        if (profileImage != null && !profileImage.isEmpty()) {
+
+	        	// 파일 저장 경로
+	            String saveDir = System.getProperty("user.dir") + "/uploads/profile/";
+	            
+	            // 파일 이름 + 풀경로
 	            String fileName = UUID.randomUUID().toString() + "_" + profileImage.getOriginalFilename();
-	            String savePath = System.getProperty("user.dir") + "/src/main/resources/static/profile/" + fileName;
+	            String fullPath = saveDir + fileName;
+	            
+	            // 폴더 없으면 생성
+	            File dir = new File(saveDir);
+	            if (!dir.exists()) dir.mkdirs();
 
-	            File dest = new File(savePath);
-	            profileImage.transferTo(dest);
-
+	            // 실제 파일 저장
+	            profileImage.transferTo(new File(fullPath));
+	            
+	            // DB에 저장할 경로
 	            imageUrl = "/profile/" + fileName;
+	            
 	        }
 
 	        // 회원가입 처리
