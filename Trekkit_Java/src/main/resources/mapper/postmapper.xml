@@ -175,17 +175,23 @@
         ORDER BY mountain
     </select>
 
-    <!-- 이미지 관련 쿼리들을 더미로 변경 -->
+    <!-- 실제 post_images 테이블에서 데이터 조회 -->
     <select id="selectImagePaths" resultType="String">
-        SELECT '' as image_path WHERE 1=0
+        SELECT image_path
+        FROM post_images
+        WHERE post_id = #{postId}
+        ORDER BY image_order ASC
     </select>
 
-    <insert id="insertImagePath">
-        SELECT 1
+    <!-- 이미지 삽입 쿼리 추가 -->
+    <insert id="insertPostImage">
+        INSERT INTO post_images (post_id, image_path, image_order, original_name, file_size)
+        VALUES (#{postId}, #{imagePath}, #{imageOrder}, #{originalName}, #{fileSize})
     </insert>
 
-    <delete id="deleteImagePaths">
-        SELECT 1
+    <!-- 이미지 삭제 쿼리 추가 -->
+    <delete id="deletePostImages">
+        DELETE FROM post_images WHERE post_id = #{postId}
     </delete>
 
     <!-- 좋아요 수 업데이트 -->
@@ -198,5 +204,17 @@
         )
         WHERE id = #{postId}
     </update>
+    
+    <!-- PostMapper.xml에서 updateCommentCount 수정 -->
+<update id="updateCommentCount">
+    UPDATE posts 
+    SET comment_count = (
+        SELECT COUNT(*) 
+        FROM comments 
+        WHERE post_id = #{postId}
+    )
+    WHERE id = #{postId}
+</update>
+    
 
 </mapper>

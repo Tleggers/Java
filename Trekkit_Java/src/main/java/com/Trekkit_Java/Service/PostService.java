@@ -298,4 +298,16 @@ public class PostService {
         String extension = getFileExtension(filename);
         return extension.matches("^(jpg|jpeg|png|gif|bmp|webp)$");
     }
+ // PostService.java에 추가할 메소드
+
+    /**
+     * 댓글 수 업데이트 (PostDAO에서 호출)
+     */
+    public void updatePostCommentCount(int postId) {
+        try {
+            postDAO.updateCommentCount(postId);
+        } catch (Exception e) {
+            throw new RuntimeException("댓글 수 업데이트 중 오류 발생: " + e.getMessage(), e);
+        }
+    }
 }

@@ -40,17 +40,9 @@ public class PostController {
         try {
             // 페이지 오프셋 계산
             int offset = page * size;
- 
-            System.out.println("sort: " + sort);
-        	System.out.println("mountain: " + mountain);
-        	System.out.println("page: " + page);
-        	System.out.println("size: " + size);
-        	System.out.println("offset: " + offset);
             
             // 게시글 목록 조회
             List<PostDTO> posts = postService.getPosts(sort, mountain, offset, size);
-            
-            System.out.println(posts);
             
             // 총 게시글 수 조회
             int totalCount = postService.getPostCount(mountain);
@@ -60,8 +52,6 @@ public class PostController {
             response.put("totalCount", totalCount); 
             response.put("currentPage", page);
             response.put("pageSize", size);
-            
-            System.out.println(response);
             
             return ResponseEntity.ok(response);
             

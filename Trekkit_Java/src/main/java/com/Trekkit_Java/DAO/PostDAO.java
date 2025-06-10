@@ -126,15 +126,32 @@ public interface PostDAO {
      */
     List<String> selectMountains();
     
+    // ========== 🔧 이미지 관련 메서드 수정/추가 부분 ==========
+    
     /**
-     * 게시글의 이미지 경로들 조회
+     * 게시글의 이미지 경로들 조회 (순서대로)
      * @param postId 게시글 ID
      * @return 이미지 경로 목록
      */
     List<String> selectImagePaths(@Param("postId") int postId);
     
     /**
-     * 게시글 이미지 경로 삽입
+     * 게시글 이미지 삽입 (상세 정보 포함) - 🆕 개선된 버전
+     * @param postId 게시글 ID
+     * @param imagePath 이미지 경로
+     * @param imageOrder 이미지 순서
+     * @param originalName 원본 파일명
+     * @param fileSize 파일 크기
+     * @return 삽입된 행 수
+     */
+    int insertPostImage(@Param("postId") int postId,
+                       @Param("imagePath") String imagePath,
+                       @Param("imageOrder") int imageOrder,
+                       @Param("originalName") String originalName,
+                       @Param("fileSize") Long fileSize);
+    
+    /**
+     * 게시글 이미지 경로 삽입 (기본 버전) - 🔄 기존 메서드 유지
      * @param postId 게시글 ID
      * @param imagePath 이미지 경로
      * @return 삽입된 행 수
@@ -142,11 +159,14 @@ public interface PostDAO {
     int insertImagePath(@Param("postId") int postId, @Param("imagePath") String imagePath);
     
     /**
-     * 게시글의 모든 이미지 경로 삭제
+     * 게시글의 모든 이미지 삭제
      * @param postId 게시글 ID
      * @return 삭제된 행 수
      */
     int deleteImagePaths(@Param("postId") int postId);
+    
+    // ========== 기존 메서드들 유지 ==========
+    
     /**
      * posts 테이블의 like_count 컬럼 업데이트
      * @param postId 게시글 ID
