@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"file:///C:\Users\805-06\Desktop\TP\5\Java\Trekkit_Java\src\main\resources\dtd\mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Trekkit_Java.DAO.PostDAO">
+
+    <!-- 게시글 ResultMap -->
+    <resultMap id="PostResultMap" type="com.Trekkit_Java.DTO.PostDTO">
+        <id property="id" column="id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="title" column="title"/>
+        <result property="mountain" column="mountain"/>
+        <result property="content" column="content"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <collection property="imagePaths" ofType="String" 
+                   select="selectImagePaths" column="id"/>
+    </resultMap>
+
+    <!-- 게시글 목록 조회 (수정된 버전 사용) -->
+    <!-- 나머지는 당신의 XML과 동일하게 유지 -->
+    <select id="selectPosts" resultMap="PostResultMap">
+        SELECT 
+            p.id,
+            p.nickname,
+            p.title,
+            p.mountain,
+            p.content,
+            p.view_count,
+            p.like_count,
+            p.comment_count,
+            p.created_at,
+            p.updated_at
+        FROM posts p
+        <where>
+            <if test="mountain != null and mountain != ''">
+                AND p.mountain = #{mountain}
+            </if>
+        </where>
+        <choose>
+            <when test="sort == '인기순'">
+                ORDER BY p.like_count DESC, p.created_at DESC
+            </when>
+            <otherwise>
+                ORDER BY p.created_at DESC
+            </otherwise>
+        </choose>
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 게시글 총 개수 조회 -->
+    <select id="selectPostCount" resultType="int">
+        SELECT COUNT(*)
+        FROM posts
+        <where>
+            <if test="mountain != null and mountain != ''">
+                AND mountain = #{mountain}
+            </if>
+        </where>
+    </select>
+
+    <!-- 게시글 상세 조회 (수정된 버전 사용) -->
+    <select id="selectPostById" resultMap="PostResultMap">
+        SELECT 
+            p.id,
+            p.nickname,
+            p.title,
+            p.mountain,
+            p.content,
+            p.view_count,
+            p.like_count,
+            p.comment_count,
+            p.created_at,
+            p.updated_at
+        FROM posts p
+        WHERE p.id = #{id}
+    </select>
+
+    <!-- 새 게시글 삽입 -->
+    <insert id="insertPost" parameterType="com.Trekkit_Java.DTO.PostDTO" 
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts (
+            nickname, 
+            title, 
+            mountain, 
+            content, 
+            view_count, 
+            created_at
+        ) VALUES (
+            #{nickname}, 
+            #{title}, 
+            #{mountain}, 
+            #{content}, 
+            0, 
+            NOW()
+        )
+    </insert>
+
+    <!-- 게시글 수정 -->
+    <update id="updatePost">
+        UPDATE posts 
+        SET 
+            title = #{title},
+            mountain = #{mountain},
+            content = #{content},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 게시글 삭제 -->
+    <delete id="deletePost">
+        DELETE FROM posts WHERE id = #{id}
+    </delete>
+
+    <!-- 조회수 증가 -->
+    <update id="increaseViewCount">
+        UPDATE posts 
+        SET view_count = view_count + 1 
+        WHERE id = #{id}
+    </update>
+
+    <!-- 좋아요 여부 확인 -->
+    <select id="selectLikeExists" resultType="int">
+        SELECT COUNT(*) 
+        FROM post_likes 
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </select>
+
+    <!-- 좋아요 추가 -->
+    <insert id="insertLike">
+        INSERT INTO post_likes (post_id, user_id, created_at) 
+        VALUES (#{postId}, #{userId}, NOW())
+    </insert>
+
+    <!-- 좋아요 삭제 -->
+    <delete id="deleteLike">
+        DELETE FROM post_likes 
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </delete>
+
+    <!-- 게시글의 총 좋아요 수 조회 -->
+    <select id="selectLikeCount" resultType="int">
+        SELECT COUNT(*) 
+        FROM post_likes 
+        WHERE post_id = #{postId}
+    </select>
+
+    <!-- 북마크 여부 확인 -->
+    <select id="selectBookmarkExists" resultType="int">
+        SELECT COUNT(*) 
+        FROM post_bookmarks 
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </select>
+
+    <!-- 북마크 추가 -->
+    <insert id="insertBookmark">
+        INSERT INTO post_bookmarks (post_id, user_id, created_at) 
+        VALUES (#{postId}, #{userId}, NOW())
+    </insert>
+
+    <!-- 북마크 삭제 -->
+    <delete id="deleteBookmark">
+        DELETE FROM post_bookmarks 
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </delete>
+
+    <!-- 산 목록 조회 -->
+    <select id="selectMountains" resultType="String">
+        SELECT DISTINCT mountain 
+        FROM posts 
+        WHERE mountain IS NOT NULL AND mountain != ''
+        ORDER BY mountain
+    </select>
+
+    <!-- 이미지 관련 쿼리들을 더미로 변경 -->
+    <select id="selectImagePaths" resultType="String">
+        SELECT '' as image_path WHERE 1=0
+    </select>
+
+    <insert id="insertImagePath">
+        SELECT 1
+    </insert>
+
+    <delete id="deleteImagePaths">
+        SELECT 1
+    </delete>
+
+    <!-- 좋아요 수 업데이트 -->
+    <update id="updateLikeCount">
+        UPDATE posts 
+        SET like_count = (
+            SELECT COUNT(*) 
+            FROM post_likes 
+            WHERE post_id = #{postId}
+        )
+        WHERE id = #{postId}
+    </update>
+
+</mapper>
