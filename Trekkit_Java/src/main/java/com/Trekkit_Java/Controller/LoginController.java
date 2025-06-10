@@ -23,6 +23,8 @@ public class LoginController {
 	
 	@PostMapping("/dologin")
     public ResponseEntity<?> doLogin(@RequestBody Map<String, String> req) {
+		
+		System.out.println("로그인 접속");
 
         try {
             String userid = req.get("userid").trim();
@@ -38,6 +40,8 @@ public class LoginController {
             // ✅ 로그인 시도 → 성공 시 JWT 토큰 반환
             Map<String, Object> result = ls.doLogin(userid, password);
 
+            System.out.println(result);
+            
             if (result != null) {
             	return ResponseEntity.ok(result);
             } else {

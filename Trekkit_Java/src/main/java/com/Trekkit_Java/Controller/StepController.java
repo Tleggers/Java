@@ -16,7 +16,7 @@ import com.Trekkit_Java.DTO.StepMonthly;
 import com.Trekkit_Java.Service.StepService;
 
 @RestController
-@RequestMapping("/api/step")
+@RequestMapping("/step")
 public class StepController {
 
     @Autowired
@@ -38,13 +38,15 @@ public class StepController {
 
     // 🔹 특정 날짜 걸음수 조회
     @GetMapping("/daily")
-    public Step getDaily(@RequestParam int userId, @RequestParam String walkDate) {
+    public Step getDaily(@RequestParam("userId") int userId,
+            				@RequestParam("walkDate") String walkDate) {
         return stepService.getDailyStep(userId, Date.valueOf(walkDate));
     }
 
     // 🔹 특정 월 누적 조회
     @GetMapping("/monthly")
-    public StepMonthly getMonthly(@RequestParam int userId, @RequestParam String month) {
+    public StepMonthly getMonthly(@RequestParam("userId") int userId,
+            							@RequestParam("month") String month) {
         return stepService.getMonthlyStep(userId, month);
     }
 } 
