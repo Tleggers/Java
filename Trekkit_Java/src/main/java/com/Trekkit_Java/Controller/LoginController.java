@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,9 +23,10 @@ public class LoginController {
 	@Autowired private LoginService ls;
 	
 	@PostMapping("/dologin")
-    public ResponseEntity<?> doLogin(@RequestBody Map<String, String> req) {
+    public ResponseEntity<?> doLogin(@RequestBody Map<String, String> req,
+    									  @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
 		
-		System.out.println("로그인 접속");
+		// RequestHeader 쓰는 이유: 프론트에서 헤더에 aud를 받아와 그걸 토큰에 넣고 싶어서
 
         try {
             String userid = req.get("userid").trim();
@@ -38,9 +40,7 @@ public class LoginController {
             }
 
             // ✅ 로그인 시도 → 성공 시 JWT 토큰 반환
-            Map<String, Object> result = ls.doLogin(userid, password);
-
-            System.out.println(result);
+            Map<String, Object> result = ls.doLogin(userid, password,clientType);
             
             if (result != null) {
             	return ResponseEntity.ok(result);
@@ -55,7 +55,8 @@ public class LoginController {
     }
 	
 	@PostMapping("/sociallogin")
-	public ResponseEntity<?> doKakaoLogin(@RequestBody Map<String, Object> req) {
+	public ResponseEntity<?> doKakaoLogin(@RequestBody Map<String, Object> req,
+												@RequestHeader(value = "X-Client-Type", required = false) String clientType) {
 
 	    try {
 	        String nickname = (String) req.get("nickname");
@@ -67,7 +68,7 @@ public class LoginController {
 	            return ResponseEntity.badRequest().body("필수 항목 누락");
 	        }
 
-	        Map<String, Object> result = ls.doKakaoLogin(authid ,nickname, profile,type);
+	        Map<String, Object> result = ls.doKakaoLogin(authid ,nickname, profile,type,clientType);
 
 	        return ResponseEntity.ok(result);
 

@@ -21,9 +21,12 @@ public class FindController {
     public ResponseEntity<Map<String, Object>> findId(@RequestBody Map<String, String> req) {
 		
         try {
-            String email = req.get("email");
+            String email = req.get("email").trim();
+            
+            String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"; // 이메일 정규식
 
-            if (email == null || email.trim().isEmpty()) {
+            if (email == null || email.trim().isEmpty() 
+               || !email.matches(emailRegex) || email.matches(".*[^a-zA-Z0-9@._%+-].*")) {
                 return ResponseEntity.badRequest().build();
             }
 

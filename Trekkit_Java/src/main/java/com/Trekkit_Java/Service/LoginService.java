@@ -25,7 +25,7 @@ public class LoginService {
 
 	// 일반 로그인
 	@Transactional(readOnly = true)
-	public Map<String, Object> doLogin(String cleanid, String cleanpw) {
+	public Map<String, Object> doLogin(String cleanid, String cleanpw, String clientType) {
 		
 		try {
 			
@@ -41,7 +41,7 @@ public class LoginService {
             if (!passwordEncoder.matches(cleanpw, user.getPassword())) return null;
 
             // 로그인 성공 시
-            String token = jwtUtil.generateToken(id); // 여기서 payload에 id가 들어감
+            String token = jwtUtil.generateToken(id,user.getUsertype(),clientType); // 여기서 payload에 id가 들어감
             Map<String, Object> result = new HashMap<>();
             result.put("token", token);
             result.put("nickname", user.getNickname());
@@ -66,7 +66,7 @@ public class LoginService {
 
      //	카카오 로그인
 	@Transactional
-	public Map<String, Object> doKakaoLogin(String authid,String nickname, String profile, String type) {
+	public Map<String, Object> doKakaoLogin(String authid,String nickname, String profile, String type, String clientType) {
 		
 		int check = 0; // 회원가입 성공 여부
 		
@@ -88,7 +88,7 @@ public class LoginService {
 	        User user = ld.findIdByAuthid(authid,type);
 	        
 	        // ✅ JWT 발급
-	        String token = jwtUtil.generateToken(user.getId());
+	        String token = jwtUtil.generateToken(user.getId(),user.getUsertype(),clientType);
 
 	        // ✅ 닉네임, 프로필도 포함해서 리턴
 	        Map<String, Object> result = new HashMap<>();

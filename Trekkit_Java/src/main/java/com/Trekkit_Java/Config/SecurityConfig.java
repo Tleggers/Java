@@ -61,7 +61,9 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/signup/**", config); // 회원가입
         source.registerCorsConfiguration("/login/**", config); // 로그인
         source.registerCorsConfiguration("/find/**", config); // 아이디 비밀번호 찾기
+        source.registerCorsConfiguration("/modify/**", config); // 수정 페이지
         source.registerCorsConfiguration("/step/**", config); // 기쁨이꺼
+        source.registerCorsConfiguration("/api/**", config); // 진우형
 
         return source;
     }

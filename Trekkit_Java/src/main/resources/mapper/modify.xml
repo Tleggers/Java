@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"file:///C:/Users/Gates/git/Java/Trekkit_Java/src/main/resources/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Trekkit_Java.DAO.ModifyDAO">
+
+	<update id="updateData">
+	  	UPDATE user set password = #{pw}, nickname = #{nickname}, profile = #{profile} WHERE id = #{id}
+	</update>
+	
+	<update id="updateDataNP">
+	  	UPDATE user set nickname = #{nickname}, profile = #{profile} WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteUser">
+    	DELETE FROM user WHERE id = #{id}
+	</delete>
+	
+</mapper>

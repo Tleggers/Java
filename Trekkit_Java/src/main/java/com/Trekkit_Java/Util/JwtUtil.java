@@ -24,18 +24,28 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
-    public String generateToken(Long id) {
+    // 토큰 생성
+    public String generateToken(Long id,String type, String clientType) {
         return Jwts.builder()
         		.claim("id", id) // payload
+        		.claim("role", type)
+        		.setIssuer("trekkit") // 발급자
+        		.setAudience(clientType) // 프론트 타입
                 .setIssuedAt(new Date()) // 발급시간
                 .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14)) // 지속시간
                 .signWith(secretKey) // 인증키
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    // 토큰 인증
+    public boolean validateToken(String token, String clientType) {
         try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .requireIssuer("trekkit")
+                .requireAudience(clientType) 
+                .build()
+                .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
