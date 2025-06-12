@@ -1,17 +1,26 @@
 package com.Trekkit_Java.Controller;
 
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Trekkit_Java.DAO.LoginDAO;
+import com.Trekkit_Java.DTO.User;
 import com.Trekkit_Java.Service.LoginService;
+import com.Trekkit_Java.Util.JwtUtil;
 
 // 2025-06-05 해야하는 일
 // 1. 소셜 로그인 구현
@@ -21,38 +30,59 @@ import com.Trekkit_Java.Service.LoginService;
 public class LoginController {
 	
 	@Autowired private LoginService ls;
+	@Autowired private JwtUtil jwtUtil;
+	@Autowired private LoginDAO ld;
 	
 	@PostMapping("/dologin")
-    public ResponseEntity<?> doLogin(@RequestBody Map<String, String> req,
-    									  @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
-		
-		// RequestHeader 쓰는 이유: 프론트에서 헤더에 aud를 받아와 그걸 토큰에 넣고 싶어서
+	public ResponseEntity<?> doLogin(@RequestBody Map<String, String> req,
+	                                 @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
+	    try {
+	    	
+	        String userid = req.get("userid").trim();
+	        String password = req.get("password").trim();
 
-        try {
-            String userid = req.get("userid").trim();
-            String password = req.get("password").trim();
+	        if (!userid.matches("^[a-zA-Z0-9]{1,16}$")
+	                || password.length() > 16
+	                || password.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣].*")) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("형식 오류: 아이디 또는 비밀번호 형식이 올바르지 않습니다.");
+	        }
 
-            // ✅ 정규식 검사
-            if (!userid.matches("^[a-zA-Z0-9]{1,16}$")
-                    || password.length() > 16
-                    || password.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣].*")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("형식 오류: 아이디 또는 비밀번호 형식이 올바르지 않습니다.");
-            }
+	        // 로그인 시도
+	        Map<String, Object> result = ls.doLogin(userid, password, clientType);
 
-            // ✅ 로그인 시도 → 성공 시 JWT 토큰 반환
-            Map<String, Object> result = ls.doLogin(userid, password,clientType);
-            
-            if (result != null) {
-            	return ResponseEntity.ok(result);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 올바르지 않습니다.");
-            }
+	        if (result != null) {
+	        	
+	            String token = (String) result.get("token");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
-        }
-    }
+	            // 만약 clientType이 web이면 아래 실행
+	            if ("web".equalsIgnoreCase(clientType)) {
+	            	
+	                // 쿠키로 내려줌
+	                ResponseCookie cookie = ResponseCookie.from("jwt", token)
+	                        .httpOnly(true)
+	                        .secure(false) // secure은 https에서만 사용
+	                        .sameSite("Lax")
+	                        .path("/")
+	                        .maxAge(Duration.ofDays(7))
+	                        .build();
+
+	                return ResponseEntity.ok()
+	                        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+	                        .body("1");
+	            } else {
+	                // 앱이면 JSON 그대로 응답
+	                return ResponseEntity.ok(result);
+	            }
+	        } else {
+	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 올바르지 않습니다.");
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+	    }
+	    
+	}
 	
 	@PostMapping("/sociallogin")
 	public ResponseEntity<?> doKakaoLogin(@RequestBody Map<String, Object> req,
@@ -76,6 +106,69 @@ public class LoginController {
 	        e.printStackTrace();
 	        return ResponseEntity.status(500).body("서버 오류 발생");
 	    }
+	}
+	
+	// 아래 메소드는 페이지 들어갈 때마다 이 api 호출 및 필요한 데이터만 리턴해서 사용하기
+	@GetMapping("/checklogin")
+	public ResponseEntity<?> checkLogin(@CookieValue(value = "jwt", required = false) String token,
+	                                    @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
+		
+	    try {
+	    	
+	    	 Map<String, Object> result = new HashMap<>();
+	    	
+	        if (token == null || clientType == null || !jwtUtil.validateToken(token, clientType)) {
+	        	result.put("isLogin", false);
+	            return ResponseEntity.ok(result);
+	        }
+
+	        // userId는 인덱스를 의미
+	        Long userId = jwtUtil.extractUserId(token);
+	        if (userId == null) {
+	            result.put("isLogin", false);
+	            return ResponseEntity.ok(result);
+	        }
+
+	        User user = ld.findById(userId);
+	        if (user == null) {
+	            result.put("isLogin", false);
+	            return ResponseEntity.ok(result);
+	        }
+
+	        // 데이터 리턴하는 곳
+//	        result.put("id", user.getUserid());
+//	        result.put("nickname", user.getNickname());
+//	        result.put("profile", user.getProfile());
+//	        result.put("logintype", user.getLogintype());
+	        
+	        result.put("isLogin", true); // 현재 로그인 여부
+
+	        return ResponseEntity.ok(result);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류");
+	    }
+	    
+	}
+	
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout() {
+		
+	    // 쿠키 삭제용 빈 쿠키 생성 (Same path & name, maxAge 0)
+	    ResponseCookie deleteCookie = ResponseCookie.from("jwt", "")
+	            .httpOnly(true)
+	            .secure(false) // 개발 중엔 false, 배포 시 true
+	            .sameSite("Lax")
+	            .path("/")
+	            .maxAge(0) // 즉시 만료
+	            .build();
+
+	    return ResponseEntity
+	            .ok()
+	            .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+	            .body("로그아웃 완료");
+	    
 	}
 
 }
