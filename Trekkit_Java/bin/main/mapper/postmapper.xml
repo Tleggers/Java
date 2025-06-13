@@ -122,24 +122,24 @@
         WHERE id = #{id}
     </update>
 
-    <!-- 좋아요 여부 확인 -->
-    <select id="selectLikeExists" resultType="int">
-        SELECT COUNT(*) 
-        FROM post_likes 
-        WHERE post_id = #{postId} AND user_id = #{userId}
-    </select>
+    <!-- 좋아요 여부 확인 - 수정 -->
+<select id="selectLikeExists" resultType="int">
+    SELECT COUNT(*) 
+    FROM post_likes 
+    WHERE post_id = #{postId} AND user_id = CAST(#{userId} AS UNSIGNED)
+</select>
 
-    <!-- 좋아요 추가 -->
-    <insert id="insertLike">
-        INSERT INTO post_likes (post_id, user_id, created_at) 
-        VALUES (#{postId}, #{userId}, NOW())
-    </insert>
+<!-- 좋아요 추가 - 수정 -->
+<insert id="insertLike">
+    INSERT INTO post_likes (post_id, user_id, created_at) 
+    VALUES (#{postId}, CAST(#{userId} AS UNSIGNED), NOW())
+</insert>
 
-    <!-- 좋아요 삭제 -->
-    <delete id="deleteLike">
-        DELETE FROM post_likes 
-        WHERE post_id = #{postId} AND user_id = #{userId}
-    </delete>
+<!-- 좋아요 삭제 - 수정 -->
+<delete id="deleteLike">
+    DELETE FROM post_likes 
+    WHERE post_id = #{postId} AND user_id = CAST(#{userId} AS UNSIGNED)
+</delete>
 
     <!-- 게시글의 총 좋아요 수 조회 -->
     <select id="selectLikeCount" resultType="int">
