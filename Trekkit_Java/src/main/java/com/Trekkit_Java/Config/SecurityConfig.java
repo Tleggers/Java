@@ -29,11 +29,14 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
 	    http
-	    	.cors(cors -> {})
+	    	.cors(cors -> corsConfigurationSource())
 	        .csrf(csrf -> csrf.disable())
 	        .authorizeHttpRequests(auth -> auth
 	            .anyRequest().permitAll()	
 	        )
+	        .oauth2Login(oauth -> oauth
+	                .defaultSuccessUrl("/login/oauth2/success", true)
+            )
 	        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 	    return http.build();
@@ -65,6 +68,11 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/modify/**", config); // 수정 페이지
         source.registerCorsConfiguration("/step/**", config); // 기쁨이꺼
         source.registerCorsConfiguration("/api/**", config); // 진우형
+        source.registerCorsConfiguration("/login/sociallogin", config); // 로그인 redirect
+        
+        // 구글
+        source.registerCorsConfiguration("/oauth2/**", config);
+        source.registerCorsConfiguration("/login/oauth2/**", config); // success 리디렉션 받을 URI
 
         return source;
     }
