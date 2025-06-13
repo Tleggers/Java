@@ -1,14 +1,18 @@
 package com.Trekkit_Java.Controller;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +25,8 @@ import com.Trekkit_Java.DAO.LoginDAO;
 import com.Trekkit_Java.DTO.User;
 import com.Trekkit_Java.Service.LoginService;
 import com.Trekkit_Java.Util.JwtUtil;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 // 2025-06-05 해야하는 일
 // 1. 소셜 로그인 구현
@@ -99,7 +105,31 @@ public class LoginController {
 	        }
 
 	        Map<String, Object> result = ls.doKakaoLogin(authid ,nickname, profile,type,clientType);
+	        
+	        // 만약 클라이언트 요청이 웹이라면 쿠키로 전달
+	        if(clientType.equals("web")) {
+	        	
+	        	String token = (String) result.get("token");
 
+		        // 웹이면 쿠키로 반환
+		        if ("web".equalsIgnoreCase(clientType)) {
+		        	
+		            ResponseCookie cookie = ResponseCookie.from("jwt", token)
+		                    .httpOnly(true)
+		                    .secure(false) // 배포 시 true로 바꿔야 함 (https 환경일 때만)
+		                    .sameSite("Lax")
+		                    .path("/")
+		                    .maxAge(Duration.ofDays(7))
+		                    .build();
+
+		            return ResponseEntity.ok()
+		                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+		                    .body("1"); 
+		        }
+	        	
+	        }
+
+	        // app이면 result만 전달
 	        return ResponseEntity.ok(result);
 
 	    } catch (Exception e) {
@@ -170,5 +200,49 @@ public class LoginController {
 	            .body("로그아웃 완료");
 	    
 	}
+	
+	@RestController
+	@RequestMapping("/login/oauth2")
+	public class OAuth2LoginController {
+
+	    @Value("${wep.api.url}")
+	    private String frontendUrl; // ex: http://localhost:3000
+
+	    @Autowired
+	    private LoginService ls;
+
+	    @Autowired
+	    private JwtUtil jwtUtil;
+
+	    @GetMapping("/success")
+	    public void oauthSuccess(Authentication auth, HttpServletResponse response) throws IOException {
+	        OAuth2User oAuth2User = (OAuth2User) auth.getPrincipal();
+
+	        // ✅ 구글에서 받은 정보
+	        String authid = oAuth2User.getAttribute("sub");
+	        String nickname = oAuth2User.getAttribute("name");
+	        String email = oAuth2User.getAttribute("email");
+	        String profile = oAuth2User.getAttribute("picture");
+
+	        // ✅ 기존 Kakao 처리 구조 재활용 (type: GOOGLE)
+	        Map<String, Object> result = ls.doKakaoLogin(authid, nickname, profile, "GOOGLE", "web");
+
+	        // ✅ JWT 추출해서 쿠키로 설정
+	        String token = (String) result.get("token");
+
+	        ResponseCookie cookie = ResponseCookie.from("jwt", token)
+	                .httpOnly(true)
+	                .path("/")
+	                .maxAge(Duration.ofDays(7))
+	                .sameSite("Lax")
+	                .build();
+
+	        response.setHeader("Set-Cookie", cookie.toString());
+
+	        // ✅ React 홈으로 이동
+	        response.sendRedirect(frontendUrl + "/");
+	    }
+	}
+
 
 }
