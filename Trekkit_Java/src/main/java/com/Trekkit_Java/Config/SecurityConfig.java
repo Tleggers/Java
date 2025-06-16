@@ -78,6 +78,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/mountains", config);
         source.registerCorsConfiguration("/mountains/**", config);
         source.registerCorsConfiguration("/apis.data.go.kr/**", config);
+
         // 구글
         source.registerCorsConfiguration("/oauth2/**", config);
         source.registerCorsConfiguration("/login/oauth2/**", config); // success 리디렉션 받을 URI
