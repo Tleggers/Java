@@ -52,5 +52,26 @@ public class FindService {
     	String hashedPw = encoder.encode(newPassword); 
         return fd.updatePassword(userid, hashedPw) > 0;
     }
+
+    @Transactional(readOnly = true)
+	public String checkUser(String userid, String email) {
+		
+    	String returnstr = "";
+    	int count = 0;
+    	
+    	try {
+    		
+    		count = fd.checkUser(userid, email);
+    		
+    		if(count == 1) {
+    			returnstr = "1";
+    		}
+    		
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
+    	return returnstr;
+	}
     
 }

@@ -20,5 +20,10 @@
         SET password = #{password}
         WHERE userid = #{userid}
     </update>
+    
+    <!-- 로그인 타입만 조회 -->
+    <select id="checkUser" resultType="java.lang.Integer">
+        SELECT Count(*) FROM user WHERE email = #{email} and userid = #{userid}
+    </select>
 
 </mapper>

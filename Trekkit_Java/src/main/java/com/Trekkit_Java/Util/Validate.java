@@ -22,5 +22,23 @@ public class Validate {
 		return true; // 모든 조건 통과
 		
 	}
+	
+	// 아이디 정규식 체크
+	public boolean useridValidate(String userid) {
+		if (userid == null || !userid.matches("^[a-zA-Z0-9]{1,16}$") || userid.equals("admin")) return false; 
+		return true;
+	}
+	
+	// nickname 정규식 체크
+	public boolean nickNameValidate(String nickname) {
+		if (nickname.matches("^[^a-zA-Z0-9가-힣\\s]+$")) return false;
+		return true;
+	}
+	
+	// email 정규식 체크
+	public boolean emailValidate(String email) {
+		if (email == null || !email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) return false;
+		return true;
+	}
 
 }

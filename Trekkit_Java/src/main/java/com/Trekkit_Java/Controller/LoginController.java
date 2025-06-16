@@ -143,10 +143,10 @@ public class LoginController {
 	public ResponseEntity<?> checkLogin(@CookieValue(value = "jwt", required = false) String token,
 	                                    @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
 		
+		Map<String, Object> result = new HashMap<>();
+		
 	    try {
-	    	
-	    	 Map<String, Object> result = new HashMap<>();
-	    	
+	   
 	        if (token == null || clientType == null || !jwtUtil.validateToken(token, clientType)) {
 	        	result.put("isLogin", false);
 	            return ResponseEntity.ok(result);
@@ -166,16 +166,18 @@ public class LoginController {
 	        }
 
 	        // 데이터 리턴하는 곳
-//	        result.put("id", user.getUserid());
-//	        result.put("nickname", user.getNickname());
-//	        result.put("profile", user.getProfile());
-//	        result.put("logintype", user.getLogintype());
+	        result.put("id", user.getUserid());
+	        result.put("nickname", user.getNickname());
+	        result.put("profile", user.getProfile());
+	        result.put("logintype", user.getLogintype());
 	        
 	        result.put("isLogin", true); // 현재 로그인 여부
 
 	        return ResponseEntity.ok(result);
 
 	    } catch (Exception e) {
+	    	result.put("isLogin", false);
+	        result.put("error", "서버 내부 오류");
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류");
 	    }
@@ -211,23 +213,27 @@ public class LoginController {
 	    @Autowired
 	    private LoginService ls;
 
-	    @Autowired
-	    private JwtUtil jwtUtil;
-
 	    @GetMapping("/success")
 	    public void oauthSuccess(Authentication auth, HttpServletResponse response) throws IOException {
+	    	
+    	    if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
+	    		 
+    	         // 인증 실패 or 인증 객체 없음 => 리다이렉트 혹은 에러 처리
+    	         response.sendRedirect(frontendUrl + "/login?error=authnull");
+    	         return;
+    	    }
+	    	 
 	        OAuth2User oAuth2User = (OAuth2User) auth.getPrincipal();
 
-	        // ✅ 구글에서 받은 정보
+	        // 구글에서 받은 정보
 	        String authid = oAuth2User.getAttribute("sub");
 	        String nickname = oAuth2User.getAttribute("name");
-	        String email = oAuth2User.getAttribute("email");
 	        String profile = oAuth2User.getAttribute("picture");
 
-	        // ✅ 기존 Kakao 처리 구조 재활용 (type: GOOGLE)
+	        // 기존 Kakao 처리 구조 재활용 (type: GOOGLE)
 	        Map<String, Object> result = ls.doKakaoLogin(authid, nickname, profile, "GOOGLE", "web");
 
-	        // ✅ JWT 추출해서 쿠키로 설정
+	        // JWT 추출해서 쿠키로 설정
 	        String token = (String) result.get("token");
 
 	        ResponseCookie cookie = ResponseCookie.from("jwt", token)
@@ -239,10 +245,10 @@ public class LoginController {
 
 	        response.setHeader("Set-Cookie", cookie.toString());
 
-	        // ✅ React 홈으로 이동
+	        // React 홈으로 이동
 	        response.sendRedirect(frontendUrl + "/");
 	    }
+	    
 	}
-
 
 }

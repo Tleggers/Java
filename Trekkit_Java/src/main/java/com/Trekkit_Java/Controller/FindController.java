@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Trekkit_Java.Service.FindService;
+import com.Trekkit_Java.Util.Validate;
 
 @RestController
 @RequestMapping("/find")
@@ -30,7 +31,7 @@ public class FindController {
                 return ResponseEntity.badRequest().build();
             }
 
-            // ✅ 서비스 호출
+            // 서비스 호출
             Map<String, Object> result = fs.findIdByEmail(email.trim());
 
             if (result == null || result.isEmpty()) {
@@ -78,5 +79,34 @@ public class FindController {
 		}
         
     }
+	
+	@PostMapping("/checkAuth")
+	public String checkUser(@RequestBody Map<String, String> req) {
+		
+		String returnstr = "";
+		Validate val = new Validate();
+		
+		try {
+			
+			String userid = req.get("userid").trim();
+			String email = req.get("email").trim();
+			
+			boolean useridVal = val.useridValidate(userid);
+			boolean emailVal = val.emailValidate(email);
+			
+			if(useridVal && emailVal) {
+				returnstr = fs.checkUser(userid,email);
+				if(returnstr.equals("1")) {
+					returnstr = "";
+				}
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	
+		return returnstr;
+		
+	}
 
 }

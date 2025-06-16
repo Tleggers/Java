@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,6 +26,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 	
 	@Autowired private JwtUtil jwtUtil;
 	@Autowired private LoginDAO ld;
+	
+	// filter를 안거칠 url
+	@Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        
+        boolean shouldSkip = path.startsWith("/login/oauth2") ||
+                path.startsWith("/oauth2/authorization") ||
+                path.startsWith("/oauth2/callback") ||
+                path.startsWith("/login/oauth2/code");
+
+				return shouldSkip;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -33,36 +46,41 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain chain)
                                     throws ServletException, IOException {
     	
+    	String token = null;
         String authHeader = request.getHeader("Authorization");
         String clientType = request.getHeader("X-Client-Type");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            if (jwtUtil.validateToken(token, clientType)) {
-            	try {
-                    Long id = jwtUtil.extractUserId(token);
+            token = authHeader.substring(7);
+        }
 
-                    // 인증 객체 생성 (User는 DTO)
-                    User user = ld.findById(id);
-                    user.setId(id);
-
-                    // auth가 참이면 user 리턴, null이면 빈객체 생성
-                    UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
-
-                    // SecurityContext에 등록
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-
-                } catch (Exception e) {
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    return;
+        if (token == null && request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
                 }
-            } else {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                return;
             }
         }
 
+        // 이미 인증되어 있는 경우는 무시
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (token != null && clientType != null && jwtUtil.validateToken(token, clientType)) {
+                try {
+                    Long id = jwtUtil.extractUserId(token);
+                    User user = ld.findById(id);
+                    if (user != null) {
+                        UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                user, null,
+                                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                            );
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+        
         chain.doFilter(request, response);
     }
 }
