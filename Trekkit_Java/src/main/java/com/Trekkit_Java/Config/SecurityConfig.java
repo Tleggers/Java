@@ -69,6 +69,9 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/step/**", config); // 기쁨이꺼
         source.registerCorsConfiguration("/api/**", config); // 진우형
         source.registerCorsConfiguration("/login/sociallogin", config); // 로그인 redirect
+        source.registerCorsConfiguration("/mountains", config);     // 정확히 /mountains
+        source.registerCorsConfiguration("/mountains/**", config);
+        source.registerCorsConfiguration("/apis.data.go.kr/**", config);
         
         // 구글
         source.registerCorsConfiguration("/oauth2/**", config);
