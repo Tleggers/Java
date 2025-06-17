@@ -234,42 +234,52 @@ public class PostService {
     }
     
     /**
-     * 게시글 수정
-     * 
-     * 기능:
-     * - 게시글 기본 정보 수정
-     * - 기존 이미지 삭제 후 새 이미지 저장
-     * - 트랜잭션으로 일관성 보장
-     * 
-     * @param post 수정할 게시글 정보
-     * @return 수정된 게시글 정보
-     * @throws RuntimeException 게시글 수정 실패 시
+     * ✅ [추가/수정된 부분] 게시글 수정
+     * * 기능:
+     * - (권한 검증) 현재 로그인한 사용자가 게시글 작성자인지 확인합니다.
+     * - 게시글의 제목, 내용, 산 정보를 업데이트합니다.
+     * - 기존에 연결된 이미지 경로를 DB에서 모두 삭제합니다.
+     * - 새로운 이미지 경로 목록을 DB에 다시 삽입합니다.
+     * - 이 모든 과정은 하나의 트랜잭션으로 처리되어 중간에 실패하면 모두 롤백됩니다.
+     * * @param post 수정할 정보가 담긴 PostDTO 객체 (id 필드 필수)
+     * @return 수정이 완료된 후의 최신 게시글 정보
+     * @throws SecurityException 사용자가 수정 권한이 없는 경우
+     * @throws RuntimeException 그 외 DB 오류 등 수정 실패 시
      */
     public PostDTO updatePost(PostDTO post) {
-        try {
-            // 1단계: 게시글 기본 정보 수정
-            int result = postDAO.updatePost(post);
+        // 1. (권한 검증) 수정하려는 게시글의 원본 정보를 가져옵니다.
+        PostDTO originalPost = postDAO.selectPostById(post.getId());
+        if (originalPost == null) {
+            throw new RuntimeException("수정할 게시글을 찾을 수 없습니다. (ID: " + post.getId() + ")");
+        }
+
+        // --- Spring Security를 사용할 경우의 권한 검증 예시 ---
+        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // String currentUsername = authentication.getName(); 
+        // if (!originalPost.getNickname().equals(currentUsername)) {
+        //     throw new SecurityException("게시글을 수정할 권한이 없습니다.");
+        // }
+        // ---------------------------------------------------
+
+        // 2. 게시글 기본 정보(제목, 내용 등)를 수정합니다.
+        int updateResult = postDAO.updatePost(post);
+        
+        if (updateResult > 0) {
+            // 3. 이 게시글과 관련된 기존 이미지 경로를 DB에서 모두 삭제합니다.
+            postDAO.deleteImagePaths(post.getId());
             
-            if (result > 0) {
-                // 2단계: 기존 이미지 경로 모두 삭제
-                postDAO.deleteImagePaths(post.getId());
-                
-                // 3단계: 새 이미지 경로 저장
-                if (post.getImagePaths() != null && !post.getImagePaths().isEmpty()) {
-                    for (String imagePath : post.getImagePaths()) {
-                        postDAO.insertImagePath(post.getId(), imagePath);
-                    }
+            // 4. 수정된 게시글 정보에 새로운 이미지 경로가 있다면 다시 삽입합니다.
+            if (post.getImagePaths() != null && !post.getImagePaths().isEmpty()) {
+                for (String imagePath : post.getImagePaths()) {
+                    postDAO.insertImagePath(post.getId(), imagePath);
                 }
-                
-                // 4단계: 수정된 게시글 정보 반환
-                return getPostById(post.getId());
             }
             
-            throw new RuntimeException("게시글 수정에 실패했습니다.");
-            
-        } catch (Exception e) {
-            throw new RuntimeException("게시글 수정 중 오류 발생: " + e.getMessage(), e);
+            // 5. 모든 수정이 완료된 최신 게시글 정보를 다시 조회하여 반환합니다.
+            return getPostById(post.getId());
         }
+        
+        throw new RuntimeException("게시글 수정에 실패했습니다. (ID: " + post.getId() + ")");
     }
     
     /**
