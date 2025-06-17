@@ -68,8 +68,9 @@ public class LoginController {
 	                        .httpOnly(true)
 	                        .secure(false) // secure은 https에서만 사용
 	                        .sameSite("Lax")
+	                        .maxAge(Duration.ofHours(4))
+//	                        .maxAge(Duration.ofMinutes(5)) // 테스트용
 	                        .path("/")
-	                        .maxAge(Duration.ofDays(7))
 	                        .build();
 
 	                return ResponseEntity.ok()
@@ -80,7 +81,7 @@ public class LoginController {
 	                return ResponseEntity.ok(result);
 	            }
 	        } else {
-	            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("아이디 또는 비밀번호가 올바르지 않습니다.");
+	        	return ResponseEntity.ok("0");
 	        }
 
 	    } catch (Exception e) {
@@ -118,8 +119,9 @@ public class LoginController {
 		                    .httpOnly(true)
 		                    .secure(false) // 배포 시 true로 바꿔야 함 (https 환경일 때만)
 		                    .sameSite("Lax")
+		                    .maxAge(Duration.ofHours(4))
+//		                    .maxAge(Duration.ofMinutes(5)) // 테스트용
 		                    .path("/")
-		                    .maxAge(Duration.ofDays(7))
 		                    .build();
 
 		            return ResponseEntity.ok()
@@ -239,7 +241,8 @@ public class LoginController {
 	        ResponseCookie cookie = ResponseCookie.from("jwt", token)
 	                .httpOnly(true)
 	                .path("/")
-	                .maxAge(Duration.ofDays(7))
+	                .maxAge(Duration.ofHours(4))
+//	                .maxAge(Duration.ofMinutes(5)) // 테스트용
 	                .sameSite("Lax")
 	                .build();
 

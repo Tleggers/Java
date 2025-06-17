@@ -32,7 +32,8 @@ public class JwtUtil {
         		.setIssuer("trekkit") // 발급자
         		.setAudience(clientType) // 프론트 타입
                 .setIssuedAt(new Date()) // 발급시간
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14)) // 지속시간
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 4)) // 지속시간 하루
+//                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 5))  // 테스트용
                 .signWith(secretKey) // 인증키
                 .compact();
     }

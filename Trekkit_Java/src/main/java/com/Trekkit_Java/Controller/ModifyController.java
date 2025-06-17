@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -163,10 +165,10 @@ public class ModifyController {
 	        }
 
 	        // 6. JSON 응답
-	        return ResponseEntity.ok(Map.of(
-	            "message", "정보 수정 완료",
-	            "profile", profileUrl
-	        ));
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("message", "정보 수정 완료");
+	        if (profileUrl != null) response.put("profile", profileUrl);
+	        return ResponseEntity.ok(response);
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
@@ -180,40 +182,46 @@ public class ModifyController {
 		
 	    try {
 	    	
-	        // 1. 헤더에서 토큰 및 clientType 추출
-	        String authHeader = request.getHeader("Authorization");
+	        // 1. 쿠키에서 토큰 및 clientType 추출
+	        String token = ExtractToken.extractToken(request);
 	        String clientType = request.getHeader("X-Client-Type");
 
-	        if (authHeader == null || !authHeader.startsWith("Bearer ") || clientType == null) {
-	            return ResponseEntity.status(401).body("인증 헤더 누락");
+	        if (token == null || clientType == null || !jwtUtil.validateToken(token, clientType)) {
+	            return ResponseEntity.status(401).body("인증 실패");
 	        }
 
-	        String token = authHeader.substring(7); // "Bearer " 제거
-
-	        // 2. 토큰 유효성 검증
-	        if (!jwtUtil.validateToken(token, clientType)) {
-	            return ResponseEntity.status(401).body("유효하지 않은 토큰");
-	        }
-
-	        // 3. 토큰에서 유저 ID 추출
+	        // 2. 토큰에서 유저 ID 추출
 	        Long userId = jwtUtil.extractUserId(token);
 	        if (userId == null) {
 	            return ResponseEntity.status(401).body("유저 ID 추출 실패");
 	        }
 
-	        // 4. 사용자 존재 확인
+	        // 3. 사용자 조회
 	        User user = ld.findById(userId);
 	        if (user == null) {
 	            return ResponseEntity.status(404).body("사용자 없음");
 	        }
 
-	        // 5. 사용자 삭제
+	        // 4. 사용자 삭제
 	        int result = md.deleteUser(userId);
 	        if (result == 0) {
 	            return ResponseEntity.status(500).body("삭제 실패");
 	        }
 
-	        return ResponseEntity.ok("회원 탈퇴 완료");
+	        // 5. 쿠키 제거 (프론트에서 삭제해도 되지만 백엔드에서 응답해줘도 좋음)
+	        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok();
+	        if ("web".equalsIgnoreCase(clientType)) {
+	            ResponseCookie deleteCookie = ResponseCookie.from("jwt", "")
+	                .httpOnly(true)
+	                .secure(false)
+	                .path("/")
+	                .sameSite("Lax")
+	                .maxAge(0)
+	                .build();
+	            responseBuilder.header(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+	        }
+
+	        return responseBuilder.body("");
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
@@ -221,5 +229,5 @@ public class ModifyController {
 	    }
 	    
 	}
-
+	
 }
