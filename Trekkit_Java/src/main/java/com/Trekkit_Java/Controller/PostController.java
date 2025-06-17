@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -322,6 +324,39 @@ public class PostController {
             errorResponse.put("success", false);
             errorResponse.put("error", "게시글 삭제 실패: " + e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+    /**
+     * ✅ [추가된 부분] 게시글 수정 API
+     * * 기능:
+     * - 특정 게시글의 정보를 업데이트합니다.
+     * - URL 경로의 ID와 전송된 데이터의 ID가 일치하는지 확인하여 안정성을 높입니다.
+     * - Spring Security 등을 통해 실제 요청을 보낸 사용자가 게시글 작성자인지 검증하는 로직이 추가되어야 안전합니다. (현재는 Service 레벨에서 처리)
+     * * @param postId 수정할 게시글의 ID (URL 경로에서 받음)
+     * @param postDTO 수정할 내용이 담긴 데이터 (Request Body에서 받음)
+     * @return ResponseEntity<PostDTO> 성공적으로 수정된 게시글 정보
+     */
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostDTO> updatePost(
+            @PathVariable("postId") int postId, 
+            @RequestBody PostDTO postDTO) {
+        
+        // URL의 ID와 요청 본문의 ID가 일치하지 않으면 잘못된 요청으로 간주
+        if (postDTO.getId() == null || postDTO.getId() != postId) {
+            return ResponseEntity.badRequest().build(); 
+        }
+
+        try {
+            // PostService를 통해 게시글 업데이트 로직 수행
+            PostDTO updatedPost = postService.updatePost(postDTO);
+            return ResponseEntity.ok(updatedPost);
+
+        } catch (SecurityException e) {
+            // 서비스 단에서 권한 예외 발생 시 403 Forbidden 반환
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            // 기타 예외 발생 시 500 Internal Server Error 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
