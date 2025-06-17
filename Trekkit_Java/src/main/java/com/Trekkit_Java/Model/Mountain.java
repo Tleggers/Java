@@ -1,10 +1,10 @@
-package com.Trekkit_Java.DTO;
+package com.Trekkit_Java.Model;
 
 import lombok.Data;
 
 @Data
-public class MountainDTO {
-    private String mntiListNo;
+public class Mountain {
+	private String mntiListNo;
     private String name;
     private String topReason;
     private String subName;
@@ -12,6 +12,4 @@ public class MountainDTO {
     private double height;
     private String summary;
     private String details;
-    private String imageName;
-    private String imageUrl;
 }

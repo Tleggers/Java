@@ -81,7 +81,7 @@ public class MountainAPIClient {
                     dto.setSummary(item.path("mntisummary").asText());
                     dto.setDetails(item.path("mntidetails").asText());
                     dto.setMntiListNo(item.path("mntilistno").asText());
-                    String imageUrl = fetchImageByMountainCode(dto.getMntiListNo());
+                    String imageUrl = "/assets/images/" + dto.getName() + "/1.jpg";
                     dto.setImageUrl(imageUrl);
 
                     mountains.add(dto);
@@ -103,63 +103,4 @@ public class MountainAPIClient {
 
         return mountains;
     }
-    
-    public String fetchImageByMountainCode(String mntiListNo) {
-        try {
-            String url = "https://apis.data.go.kr/1400000/service/cultureInfoService2/mntInfoImgOpenAPI2"
-                    + "?serviceKey=" + serviceKey
-                    + "&mntiListNo=" + mntiListNo
-                    + "&pageNo=1"
-                    + "&numOfRows=1";
-
-            URL apiUrl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) apiUrl.openConnection();
-            conn.setRequestMethod("GET");
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = rd.readLine()) != null) {
-                sb.append(line);
-            }
-
-            rd.close();
-            conn.disconnect();
-
-//            ObjectMapper mapper = new ObjectMapper();
-//            JsonNode root = mapper.readTree(sb.toString());
-//            JsonNode itemNode  = root.path("response").path("body").path("items").path("item");
-//
-//            if (itemNode.isArray() && itemNode.size() > 0) {
-//                return itemNode.get(0).path("imgfilename").asText();
-//            } else if (itemNode.isObject()) {
-//            	String filename = itemNode.path("imgfilename").asText();
-//            	String fullImageUrl = "https://www.forest.go.kr/images/data/down/mountain/" + filename;
-//            	return fullImageUrl;
-//
-//            } else {
-//                System.out.println("이미지 없음 또는 응답 구조 이상: " + itemNode.toString());
-//            }
-            
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            InputStream is = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
-            Document doc = builder.parse(is);
-            doc.getDocumentElement().normalize();
-
-            NodeList nList = doc.getElementsByTagName("item");
-            if (nList.getLength() > 0) {
-                Element element = (Element) nList.item(0);
-                String filename = element.getElementsByTagName("imgfilename").item(0).getTextContent();
-                // 전체 이미지 경로 구성
-                return "https://www.forest.go.kr/images/data/down/mountain/" + filename;
-            }
-            
-        } catch (Exception e) {
-        	System.out.println("이미지 API XML 오류: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }
