@@ -71,7 +71,7 @@ public class LoginService {
 		int check = 0; // 회원가입 성공 여부
 		
 	    try {
-	        // ✅ DB에 유저 존재 여부 확인 (소셜 로그인은 이메일 기준)
+	        // DB에 유저 존재 여부 확인 (소셜 로그인은 이메일 기준)
 	        Map<String, Object> who = ld.findUserByAuthId(authid, type);
 
 	        if (who == null) {
@@ -87,10 +87,10 @@ public class LoginService {
 	        // 이메일로 유저 찾기
 	        User user = ld.findIdByAuthid(authid,type);
 	        
-	        // ✅ JWT 발급
+	        // JWT 발급
 	        String token = jwtUtil.generateToken(user.getId(),user.getUsertype(),clientType);
 
-	        // ✅ 닉네임, 프로필도 포함해서 리턴
+	        // 닉네임, 프로필도 포함해서 리턴
 	        Map<String, Object> result = new HashMap<>();
 	        result.put("token", token);
 	        result.put("nickname", user.getNickname());
