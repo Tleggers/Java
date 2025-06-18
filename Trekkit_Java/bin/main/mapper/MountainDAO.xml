@@ -1,34 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"file:///C:/Users/805-10/eclipse-workspace2/Java/Trekkit_Java/src/main/resources/dtd/mybatis-3-mapper.dtd">
-<!--Users/Gates/git/Java/Trekkit_Java-->
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--"file:///C:/Users/805-10/eclipse-workspace2/Java/Trekkit_Java/src/main/resources/dtd/mybatis-3-mapper.dtd">Users/Gates/git/Java/Trekkit_Java-->
 
 <mapper namespace="com.Trekkit_Java.DAO.MountainDAO">
-
-    <insert id="insertMountain" parameterType="com.Trekkit_Java.Model.Mountain">
+	
+	<insert id="insertMountain" parameterType="com.Trekkit_Java.Model.Mountain">
         INSERT INTO mountains
-        (mntilistno, mntiname, mntitop, mntisname, mntiadd, mntihigh, mntisummary, mntidetails)
+        (mntilistno, mntiname, mntiadd, mntihigh, mntidetails, image_url)
         VALUES
-        (#{mntiListNo}, #{name}, #{topReason}, #{subName}, #{location}, #{height}, #{summary}, #{details})
+        (#{mntiListNo}, #{name}, #{location}, #{height}, #{details}, #{imageUrl})
     </insert>
-
-    <!--<select id="selectByInitial" resultType="com.Trekkit_Java.Model.Mountain">
-        SELECT * FROM mountains
-        WHERE name LIKE CONCAT(#{initial}, '%')
-        ORDER BY name
-        LIMIT #{offset}, #{size}
-    </select>-->
-
-    <select id="selectAll" resultType="com.Trekkit_Java.Model.Mountain">
-        SELECT * FROM mountains
-        ORDER BY name
-        LIMIT #{offset}, #{size}
-    </select>
     
-    <!--<select id="selectByInitial" parameterType="map" resultType="com.Trekkit_Java.Model.Mountain">
+	<select id="selectByRegion" parameterType="map" resultType="com.Trekkit_Java.Model.Mountain">
 	    SELECT * FROM mountains
-	    WHERE name LIKE CONCAT(#{initial}, '%')
+	    WHERE location LIKE CONCAT('%', #{region}, '%')
 	    ORDER BY name
 	    LIMIT #{offset}, #{size}
 	</select>
@@ -37,5 +23,6 @@
 	    SELECT * FROM mountains
 	    ORDER BY name
 	    LIMIT #{offset}, #{size}
-	</select>-->
+	</select>
+	
 </mapper>
