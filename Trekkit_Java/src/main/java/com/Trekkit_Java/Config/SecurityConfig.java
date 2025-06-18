@@ -34,6 +34,7 @@ public class SecurityConfig {
 	        .csrf(csrf -> csrf.disable())
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 	        .authorizeHttpRequests(auth -> auth
+	        		.requestMatchers("/modify/**").authenticated()
 	                .anyRequest().permitAll() // 나머지는 인증 불필요
 	        )
 	        .oauth2Login(oauth -> oauth
@@ -77,7 +78,9 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/login/sociallogin", config); // 로그인 redirect
         source.registerCorsConfiguration("/mountains", config);
         source.registerCorsConfiguration("/mountains/**", config);
+        source.registerCorsConfiguration("/mountainimage/**", config); 
         source.registerCorsConfiguration("/apis.data.go.kr/**", config);
+        source.registerCorsConfiguration("/theme/**", config);
 
         // 구글
         source.registerCorsConfiguration("/oauth2/**", config);
