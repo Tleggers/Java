@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class MountainDTO {
-    private String mntiListNo;
-    private String name;
-    private String location;
-    private double height;
-    private String details;
+    private String mntilistno;
+    private String mntiname;
+    private String mntiadd;
+    private double mntihigh;
+    private String mntidetails;
     private String imageUrl;
 }

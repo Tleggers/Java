@@ -9,20 +9,50 @@
         INSERT INTO mountains
         (mntilistno, mntiname, mntiadd, mntihigh, mntidetails, image_url)
         VALUES
-        (#{mntiListNo}, #{name}, #{location}, #{height}, #{details}, #{imageUrl})
+        (#{mntiListNo}, #{mntiname}, #{mntiadd}, #{mntihigh}, #{mntidetails}, #{imageUrl})
     </insert>
     
 	<select id="selectByRegion" parameterType="map" resultType="com.Trekkit_Java.Model.Mountain">
 	    SELECT * FROM mountains
-	    WHERE location LIKE CONCAT('%', #{region}, '%')
-	    ORDER BY name
+	    WHERE 1=1
+		    <if test="location != null and location != ''">
+		        AND mntiadd LIKE CONCAT('%', #{location}, '%')
+		    </if>
+			<if test="initialStart != null and initialEnd != null">
+    			AND mntiname BETWEEN #{initialStart} AND #{initialEnd}
+  			</if>
+	    ORDER BY mntiname
 	    LIMIT #{offset}, #{size}
 	</select>
 	
 	<select id="selectAll" parameterType="map" resultType="com.Trekkit_Java.Model.Mountain">
 	    SELECT * FROM mountains
-	    ORDER BY name
+	    ORDER BY mntiname
 	    LIMIT #{offset}, #{size}
 	</select>
 	
+	<select id="selectByListNo" parameterType="int" resultType="Mountain">
+    	SELECT * FROM mountains WHERE mntilistno = #{mntilistno}
+	</select>
+
+	<select id="countAll" resultType="int">
+	    SELECT COUNT(*) FROM mountains
+	</select>
+	
+	<select id="countByLocation" parameterType="string" resultType="int">
+	    SELECT COUNT(*) FROM mountains
+	    WHERE mntiadd LIKE CONCAT('%', #{location}, '%')
+	</select>
+	
+	<select id="countByCondition" parameterType="map" resultType="int">
+	  SELECT COUNT(*) FROM mountains
+	  WHERE 1=1
+	  <if test="location != null and location != ''">
+	    AND mntiadd LIKE CONCAT('%', #{location}, '%')
+	  </if>
+	  <if test="initial != null and initial != ''">
+	    AND mntiname BETWEEN #{initialStart} AND #{initialEnd}
+	  </if>
+	</select>
+
 </mapper>

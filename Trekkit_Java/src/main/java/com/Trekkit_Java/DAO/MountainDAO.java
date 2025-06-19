@@ -13,4 +13,8 @@ public interface MountainDAO {
 	 
 	 	List<Mountain> selectByRegion(Map<String, Object> params);
 	    List<Mountain> selectAll(Map<String, Object> params);
+	    int countAll();
+	    int countByLocation(String location);
+		int countByCondition(Map<String, Object> params);
+		Mountain selectByListNo(int mntilistno);
 }
