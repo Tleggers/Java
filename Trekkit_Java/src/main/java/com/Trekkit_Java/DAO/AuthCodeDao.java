@@ -1,19 +1,20 @@
 package com.Trekkit_Java.DAO;
 
+import org.apache.ibatis.annotations.Delete; // @Delete 어노테이션을 import 합니다.
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-// 2025-06-04 완
 
 @Mapper
 public interface AuthCodeDao {
 
-	void deleteEmail(@Param("email") String cleanEmail); 
+    void deleteEmail(@Param("email") String cleanEmail); 
 
-	void insertAuthCode(@Param("email") String cleanEmail, @Param("authCode") String authCode);
+    void insertAuthCode(@Param("email") String cleanEmail, @Param("authCode") String authCode);
 
-	void deleteExpiredCodes();
+    // 이 메서드 위에 @Delete 어노테이션과 SQL 쿼리를 추가합니다.
+    @Delete("DELETE FROM authcode WHERE created < NOW() - INTERVAL 10 MINUTE")
+    void deleteExpiredCodes();
 
-	int verifyCode(@Param("email") String cleanEmail, @Param("code") String authcode);
+    int verifyCode(@Param("email") String cleanEmail, @Param("code") String authcode);
 
 }

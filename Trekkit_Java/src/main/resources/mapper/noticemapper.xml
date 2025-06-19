@@ -7,6 +7,7 @@
     <resultMap id="NoticeResultMap" type="com.Trekkit_Java.DTO.NoticeDTO">
         <id property="noticeId" column="notice_id"/>
         <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/> <!-- 닉네임 필드 매핑 추가 -->
         <result property="title" column="title"/>
         <result property="content" column="content"/>
         <result property="category" column="category"/>
@@ -15,31 +16,69 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+    <!-- 모든 공지사항 목록 조회 (페이징) -->
     <select id="selectAllNotices" resultMap="NoticeResultMap">
-        SELECT * FROM notices
-        ORDER BY created_at DESC
+        SELECT
+            n.notice_id,
+            n.user_id,
+            COALESCE(u.nickname, '탈퇴한 회원') as nickname, -- user_id가 NULL일 경우 '탈퇴한 회원'으로 표시
+            n.title,
+            n.content,
+            n.category,
+            n.view_count,
+            n.created_at,
+            n.updated_at
+        FROM notices n
+        LEFT JOIN user u ON n.user_id = u.id
+        ORDER BY n.created_at DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
+    <!-- 카테고리별 공지사항 목록 조회 (페이징) - (프론트에서 카테고리 기능 제거되었지만, DAO는 유지) -->
     <select id="selectNoticesByCategory" resultMap="NoticeResultMap">
-        SELECT * FROM notices
-        WHERE category = #{category}
-        ORDER BY created_at DESC
+        SELECT
+            n.notice_id,
+            n.user_id,
+            COALESCE(u.nickname, '탈퇴한 회원') as nickname, -- user_id가 NULL일 경우 '탈퇴한 회원'으로 표시
+            n.title,
+            n.content,
+            n.category,
+            n.view_count,
+            n.created_at,
+            n.updated_at
+        FROM notices n
+        LEFT JOIN user u ON n.user_id = u.id
+        WHERE n.category = #{category}
+        ORDER BY n.created_at DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <select id="selectTotalCount" resultType="int">
+    <!-- 공지사항 총 개수 조회 (getNotices()에서 사용) -->
+    <select id="getTotalNoticeCount" resultType="int">
         SELECT COUNT(*) FROM notices
     </select>
     
+    <!-- 카테고리별 공지사항 개수 조회 (프론트에서 카테고리 기능 제거되었지만, DAO는 유지) -->
     <select id="selectCountByCategory" resultType="int">
         SELECT COUNT(*) FROM notices
         WHERE category = #{category}
     </select>
 
+    <!-- 공지사항 상세 조회 -->
     <select id="selectNoticeById" resultMap="NoticeResultMap">
-        SELECT * FROM notices
-        WHERE notice_id = #{noticeId}
+        SELECT
+            n.notice_id,
+            n.user_id,
+            COALESCE(u.nickname, '탈퇴한 회원') as nickname, -- user_id가 NULL일 경우 '탈퇴한 회원'으로 표시
+            n.title,
+            n.content,
+            n.category,
+            n.view_count,
+            n.created_at,
+            n.updated_at
+        FROM notices n
+        LEFT JOIN user u ON n.user_id = u.id
+        WHERE n.notice_id = #{noticeId}
     </select>
     
     <update id="increaseViewCount">
@@ -48,25 +87,24 @@
         WHERE notice_id = #{noticeId}
     </update>
 
-    <!-- ✅ [수정된 부분] 
-         useGeneratedKeys="true" 와 keyProperty="noticeId" 속성을 추가했습니다.
-         이 설정을 통해 DB에서 AUTO_INCREMENT로 생성된 notice_id 값을
-         파라미터로 받은 NoticeDTO 객체의 noticeId 필드에 자동으로 다시 채워줍니다.
-    -->
+    <!-- 새 공지사항 작성 -->
     <insert id="insertNotice" parameterType="com.Trekkit_Java.DTO.NoticeDTO" 
             useGeneratedKeys="true" keyProperty="noticeId">
-        INSERT INTO notices (user_id, title, content, category)
-        VALUES (#{userId}, #{title}, #{content}, #{category})
+        INSERT INTO notices (user_id, title, content, category, created_at, updated_at)
+        VALUES (#{userId}, #{title}, #{content}, #{category}, #{createdAt}, #{updatedAt})
     </insert>
 
+    <!-- 공지사항 수정 -->
     <update id="updateNotice" parameterType="com.Trekkit_Java.DTO.NoticeDTO">
         UPDATE notices
         SET title = #{title},
             content = #{content},
-            category = #{category}
+            category = #{category},
+            updated_at = #{updatedAt}
         WHERE notice_id = #{noticeId}
     </update>
 
+    <!-- 공지사항 삭제 -->
     <delete id="deleteNotice">
         DELETE FROM notices
         WHERE notice_id = #{noticeId}
