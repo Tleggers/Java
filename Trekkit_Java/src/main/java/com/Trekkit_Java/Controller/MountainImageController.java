@@ -20,7 +20,6 @@ public class MountainImageController {
 
     @GetMapping("/images")
     public List<MountainImageDTO> getImagesByRegion(@RequestParam("region") String region) {
-    	System.err.println("이미지출력");
         return service.getImagesByRegion(region);
     }
 }
