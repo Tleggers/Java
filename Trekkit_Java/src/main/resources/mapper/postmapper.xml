@@ -3,20 +3,38 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.Trekkit_Java.DAO.PostDAO">
-    <select id="findAll" resultType="com.Trekkit_Java.DTO.PostDTO">
-        SELECT id, user_id, nickname, title, mountain, content, view_count, like_count, comment_count, created_at
-        FROM posts
+
+    <resultMap id="PostResultMap" type="com.Trekkit_Java.DTO.PostDTO">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="userLoginId" column="user_login_id"/> <result property="title" column="title"/>
+        <result property="mountain" column="mountain"/>
+        <result property="content" column="content"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        </resultMap>
+
+    <select id="findAll" resultMap="PostResultMap">
+        SELECT
+            p.id, p.user_id, u.nickname, u.userid AS user_login_id,
+            p.title, p.mountain, p.content, p.view_count, p.like_count, p.comment_count, p.created_at
+        FROM posts p
+        JOIN user u ON p.user_id = u.id
         <where>
             <if test="mountain != null and mountain != ''">
-                AND mountain = #{mountain}
+                AND p.mountain = #{mountain}
             </if>
         </where>
         <choose>
             <when test="sort == '인기순'">
-                ORDER BY like_count DESC, created_at DESC
+                ORDER BY p.like_count DESC, p.created_at DESC
             </when>
             <otherwise>
-                ORDER BY created_at DESC
+                ORDER BY p.created_at DESC
             </otherwise>
         </choose>
         LIMIT #{limit} OFFSET #{offset}
@@ -31,58 +49,83 @@
         </where>
     </select>
 
-    <select id="findById" resultType="com.Trekkit_Java.DTO.PostDTO">
-        SELECT * FROM posts WHERE id = #{postId}
+    <select id="findById" resultMap="PostResultMap">
+        SELECT
+            p.id, p.user_id, u.nickname, u.userid AS user_login_id,
+            p.title, p.content, p.mountain,
+            p.view_count, p.like_count, p.comment_count, p.created_at, p.updated_at
+        FROM posts p
+        JOIN user u ON p.user_id = u.id
+        WHERE p.id = #{postId}
     </select>
-    
+
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO posts (user_id, nickname, title, mountain, content, created_at, updated_at)
-        VALUES (#{userId}, #{nickname}, #{title}, #{mountain}, #{content}, NOW(), NOW())
+        INSERT INTO posts (user_id, title, mountain, content, created_at, updated_at)
+        VALUES (#{userId}, #{title}, #{mountain}, #{content}, NOW(), NOW())
     </insert>
-    
+
     <update id="update">
         UPDATE posts
         SET title = #{title}, mountain = #{mountain}, content = #{content}, updated_at = NOW()
         WHERE id = #{id}
     </update>
-    
+
     <delete id="delete">
         DELETE FROM posts WHERE id = #{postId}
     </delete>
-    
+
     <update id="increaseViewCount">
         UPDATE posts SET view_count = view_count + 1 WHERE id = #{postId}
     </update>
-    
+
     <insert id="saveImage">
         INSERT INTO post_images (post_id, image_path) VALUES (#{postId}, #{imagePath})
     </insert>
-    
+
     <select id="findImagesByPostId" resultType="string">
         SELECT image_path FROM post_images WHERE post_id = #{postId} ORDER BY id ASC
     </select>
-    
+
     <delete id="deleteImagesByPostId">
         DELETE FROM post_images WHERE post_id = #{postId}
     </delete>
-    
+
     <insert id="addLike">
         INSERT INTO post_likes (post_id, user_id, created_at) VALUES (#{postId}, #{userId}, NOW())
     </insert>
-    
+
     <delete id="deleteLike">
         DELETE FROM post_likes WHERE post_id = #{postId} AND user_id = #{userId}
     </delete>
-    
+
     <select id="findLikeByPostIdAndUserId" resultType="int">
         SELECT COUNT(*) FROM post_likes WHERE post_id = #{postId} AND user_id = #{userId}
     </select>
-    
+
     <update id="updateLikeCount">
-        UPDATE posts SET like_count = (SELECT COUNT(*) FROM post_likes WHERE post_id = #{postId}) WHERE id = #{postId}
+        UPDATE posts p SET p.like_count = (SELECT COUNT(*) FROM post_likes pl WHERE pl.post_id = p.id)
+        WHERE p.id = #{postId}
     </update>
-    
+
     <update id="updateCommentCount">
-        UPDATE posts SET comment_count = (SELECT COUNT(*) FROM comments WHERE post_id = #{postId}) WHERE id = #{postId}
+        UPDATE posts p SET p.comment_count = (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id)
+        WHERE p.id = #{postId}
     </update>
+
+    <select id="getLikeCount" resultType="int">
+        SELECT like_count FROM posts WHERE id = #{postId}
+    </select>
+
+    <insert id="addBookmark">
+        INSERT INTO post_bookmarks (post_id, user_id, created_at) VALUES (#{postId}, #{userId}, NOW())
+    </insert>
+
+    <delete id="deleteBookmark">
+        DELETE FROM post_bookmarks WHERE post_id = #{postId} AND user_id = #{userId}
+    </delete>
+
+    <select id="findBookmarkByPostIdAndUserId" resultType="int">
+        SELECT COUNT(*) FROM post_bookmarks WHERE post_id = #{postId} AND user_id = #{userId}
+    </select>
+
 </mapper>

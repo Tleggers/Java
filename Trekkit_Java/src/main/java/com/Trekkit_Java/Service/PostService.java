@@ -17,10 +17,12 @@ public class PostService {
 
     private final PostDAO postDAO;
 
+    // ... 기존 createPost, getPostById, getAllPosts, updatePost, deletePost 메소드는 동일 ...
     @Transactional
     public PostDTO createPost(PostDTO postDTO, Long userId) {
         postDTO.setUserId(userId);
         postDAO.save(postDTO);
+        
         if (postDTO.getImagePaths() != null && !postDTO.getImagePaths().isEmpty()) {
             for (String imagePath : postDTO.getImagePaths()) {
                 postDAO.saveImage(postDTO.getId(), imagePath);
@@ -30,7 +32,7 @@ public class PostService {
     }
 
     @Transactional
-    public PostDTO getPostById(int postId) {
+    public PostDTO getPostById(Long postId) {
         postDAO.increaseViewCount(postId);
         PostDTO post = postDAO.findById(postId);
         if (post != null) {
@@ -72,17 +74,18 @@ public class PostService {
             throw new SecurityException("게시글을 수정할 권한이 없습니다.");
         }
         postDAO.update(postDTO);
+
         postDAO.deleteImagesByPostId(postDTO.getId());
         if (postDTO.getImagePaths() != null && !postDTO.getImagePaths().isEmpty()) {
             for (String imagePath : postDTO.getImagePaths()) {
                 postDAO.saveImage(postDTO.getId(), imagePath);
             }
         }
-        return postDTO;
+        return postDAO.findById(postDTO.getId());
     }
     
     @Transactional
-    public void deletePost(int postId, Long userId) {
+    public void deletePost(Long postId, Long userId) {
         PostDTO post = postDAO.findById(postId);
         if (post == null) {
             throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
@@ -94,7 +97,7 @@ public class PostService {
     }
     
     @Transactional
-    public boolean toggleLike(int postId, Long userId) {
+    public boolean toggleLike(Long postId, Long userId) {
         boolean isLiked;
         if (postDAO.findLikeByPostIdAndUserId(postId, userId) > 0) {
             postDAO.deleteLike(postId, userId);
@@ -105,5 +108,25 @@ public class PostService {
         }
         postDAO.updateLikeCount(postId);
         return isLiked;
+    }
+
+    // [추가] 좋아요 개수를 가져오는 메소드
+    @Transactional(readOnly = true)
+    public int getLikeCount(Long postId) {
+        return postDAO.getLikeCount(postId);
+    }
+
+    // [추가] 북마크 토글 기능 구현
+    @Transactional
+    public boolean toggleBookmark(Long postId, Long userId) {
+        boolean isBookmarked;
+        if (postDAO.findBookmarkByPostIdAndUserId(postId, userId) > 0) {
+            postDAO.deleteBookmark(postId, userId);
+            isBookmarked = false;
+        } else {
+            postDAO.addBookmark(postId, userId);
+            isBookmarked = true;
+        }
+        return isBookmarked;
     }
 }
