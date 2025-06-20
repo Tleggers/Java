@@ -11,7 +11,6 @@ public interface AuthCodeDao {
 
     void insertAuthCode(@Param("email") String cleanEmail, @Param("authCode") String authCode);
 
-//    @Delete("DELETE FROM authcode WHERE created < NOW() - INTERVAL 10 MINUTE")
     void deleteExpiredCodes();
 
     int verifyCode(@Param("email") String cleanEmail, @Param("code") String authcode);

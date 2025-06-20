@@ -7,53 +7,23 @@ import com.Trekkit_Java.DTO.CommentDTO;
 
 @Mapper
 public interface CommentDAO {
-    
-    /**
-     * 특정 게시글의 댓글 목록 조회
-     * @param postId 게시글 ID
-     * @return 댓글 목록
-     */
-    List<CommentDTO> selectCommentsByPostId(@Param("postId") int postId);
-    
-    /**
-     * 댓글 상세 조회
-     * @param id 댓글 ID
-     * @return 댓글 정보
-     */
-    CommentDTO selectCommentById(@Param("id") int id);
-    
-    /**
-     * 새 댓글 삽입
-     * @param comment 댓글 정보
-     * @return 삽입된 행 수
-     */
+
+    // [수정] 파라미터 타입을 Long으로 변경 (이전에 이미 제안되었고, CommentService와 일치시킴)
+    List<CommentDTO> selectCommentsByPostId(@Param("postId") Long postId);
+
+    // [수정] 파라미터 타입을 Long으로 변경
+    CommentDTO selectCommentById(@Param("id") Long id);
+
     int insertComment(CommentDTO comment);
-    
-    /**
-     * 댓글 수정
-     * @param comment 수정할 댓글 정보
-     * @return 수정된 행 수
-     */
+
     int updateComment(CommentDTO comment);
-    
-    /**
-     * 댓글 삭제
-     * @param id 댓글 ID
-     * @return 삭제된 행 수
-     */
-    int deleteComment(@Param("id") int id);
-    
-    /**
-     * 특정 게시글의 댓글 수 조회
-     * @param postId 게시글 ID
-     * @return 댓글 수
-     */
-    int selectCommentCountByPostId(@Param("postId") int postId);
-    
-    /**
-     * 특정 사용자의 댓글 목록 조회
-     * @param userId 사용자 ID
-     * @return 댓글 목록
-     */
-    List<CommentDTO> selectCommentsByUserId(@Param("userId") String userId);
+
+    // [수정] 파라미터 타입을 Long으로 변경
+    int deleteComment(@Param("id") Long id);
+
+    // [수정] 파라미터 타입을 Long으로 변경
+    int selectCommentCountByPostId(@Param("postId") Long postId);
+
+    // [수정] 파라미터 타입을 Long으로 변경
+    List<CommentDTO> selectCommentsByUserId(@Param("userId") Long userId);
 }
