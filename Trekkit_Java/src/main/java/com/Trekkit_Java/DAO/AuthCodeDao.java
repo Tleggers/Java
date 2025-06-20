@@ -11,8 +11,7 @@ public interface AuthCodeDao {
 
     void insertAuthCode(@Param("email") String cleanEmail, @Param("authCode") String authCode);
 
-    // 이 메서드 위에 @Delete 어노테이션과 SQL 쿼리를 추가합니다.
-    @Delete("DELETE FROM authcode WHERE created < NOW() - INTERVAL 10 MINUTE")
+//    @Delete("DELETE FROM authcode WHERE created < NOW() - INTERVAL 10 MINUTE")
     void deleteExpiredCodes();
 
     int verifyCode(@Param("email") String cleanEmail, @Param("code") String authcode);
