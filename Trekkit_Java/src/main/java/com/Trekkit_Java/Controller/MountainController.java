@@ -25,11 +25,12 @@ public class MountainController {
     public Map<String, Object> getMountains(@RequestBody Map<String, Object> request) {
         int page = Integer.parseInt(request.get("page").toString());
         int size = Integer.parseInt(request.get("size").toString());
+        String search = (String) request.get("search") != null ? request.get("search").toString() : "";
         String location = request.get("location") != null ? request.get("location").toString() : "";
         String initial = request.get("initial") != null ? request.get("initial").toString() : "";
 
-        List<Mountain> data = mountainService.getPagedAndFiltered(page, size, location, initial);
-        int totalCount = mountainService.countByInitial(location, initial);
+        List<Mountain> data = mountainService.filteredMountains(page, size, search, location, initial);
+        int totalCount = mountainService.countByInitial(location, search, initial);
 
         int totalPages = (int) Math.ceil((double) totalCount / size);
 
@@ -50,5 +51,12 @@ public class MountainController {
     	}
     	int mntilistno = Integer.parseInt(noObj.toString());
         return mountainService.getMountainByListNo(mntilistno);
+    }
+    
+    @PostMapping("/search")
+    @ResponseBody
+    public List<Mountain> searchByName(@RequestBody Map<String, String> body) {
+        String name = body.get("name");
+        return mountainService.searchByName(name);
     }
 }

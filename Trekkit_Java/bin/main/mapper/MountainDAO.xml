@@ -12,7 +12,7 @@
         (#{mntiListNo}, #{mntiname}, #{mntiadd}, #{mntihigh}, #{mntidetails}, #{imageUrl})
     </insert>
     
-	<select id="selectByRegion" parameterType="map" resultType="com.Trekkit_Java.Model.Mountain">
+	<select id="filteredMountains" parameterType="map" resultType="com.Trekkit_Java.Model.Mountain">
 	    SELECT * FROM mountains
 	    WHERE 1=1
 		    <if test="location != null and location != ''">
@@ -21,6 +21,9 @@
 			<if test="initialStart != null and initialEnd != null">
     			AND mntiname BETWEEN #{initialStart} AND #{initialEnd}
   			</if>
+  			<if test="search != null and search != ''">
+      			AND mntiname LIKE CONCAT('%', #{search}, '%')
+    		</if>
 	    ORDER BY mntiname
 	    LIMIT #{offset}, #{size}
 	</select>
@@ -33,6 +36,11 @@
 	
 	<select id="selectByListNo" parameterType="int" resultType="Mountain">
     	SELECT * FROM mountains WHERE mntilistno = #{mntilistno}
+	</select>
+	
+	<select id="searchByName" resultType="MountainDTO" parameterType="String">
+	  SELECT * FROM mountain
+	  WHERE mntiname LIKE CONCAT('%', #{name}, '%')
 	</select>
 
 	<select id="countAll" resultType="int">
@@ -53,6 +61,9 @@
 	  <if test="initial != null and initial != ''">
 	    AND mntiname BETWEEN #{initialStart} AND #{initialEnd}
 	  </if>
+	  <if test="search != null and search != ''">
+      	AND mntiname LIKE CONCAT('%', #{search}, '%')
+      </if>
 	</select>
 
 </mapper>

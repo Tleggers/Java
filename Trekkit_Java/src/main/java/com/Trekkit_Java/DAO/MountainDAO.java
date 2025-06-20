@@ -11,10 +11,11 @@ import com.Trekkit_Java.Model.Mountain;
 public interface MountainDAO {
 	 void insertMountain(Mountain mountain);
 	 
-	 	List<Mountain> selectByRegion(Map<String, Object> params);
+	 	List<Mountain> filteredMountains(Map<String, Object> params);
 	    List<Mountain> selectAll(Map<String, Object> params);
+	    Mountain selectByListNo(int mntilistno);
+	    List<Mountain> searchByName(String name);
 	    int countAll();
 	    int countByLocation(String location);
 		int countByCondition(Map<String, Object> params);
-		Mountain selectByListNo(int mntilistno);
 }

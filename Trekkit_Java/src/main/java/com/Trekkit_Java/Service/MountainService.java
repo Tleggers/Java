@@ -26,12 +26,13 @@ public class MountainService {
 	    return mountainDAO.selectAll(params);
 	}
 
-    public List<Mountain> getPagedAndFiltered(int page, int size, String location, String initial) {
+    public List<Mountain> filteredMountains(int page, int size, String search, String location, String initial) {
         int offset = (page - 1) * size;
         
 	      Map<String, Object> params = new HashMap<>();
 	      params.put("offset", offset);
 	      params.put("size", size);
+	      params.put("search", search);
 	
 	      if (location != null && !location.trim().isEmpty()) {
 	    	  params.put("location", location);
@@ -56,11 +57,15 @@ public class MountainService {
 	            }
 	            params.put("initial", initial);
 	        }
-	     return mountainDAO.selectByRegion(params);
+	     return mountainDAO.filteredMountains(params);
     }
     
     public Mountain getMountainByListNo(int mntilistno) {
         return mountainDAO.selectByListNo(mntilistno);
+    }
+    
+    public List<Mountain> searchByName(String name) {
+        return mountainDAO.searchByName(name);
     }
     
     public int countAll() {
@@ -71,11 +76,15 @@ public class MountainService {
         return mountainDAO.countByLocation(location);
     }
     
-    public int countByInitial(String location, String initial) {
+    public int countByInitial(String location, String search, String initial) {
     	    Map<String, Object> params = new HashMap<>();
 
     	    if (location != null && !location.isEmpty()) {
     	        params.put("location", location);
+    	    }
+    	    
+    	    if (search != null && !search.isEmpty()) {
+    	        params.put("search", search);
     	    }
 
     	    if (initial != null && !initial.isEmpty()) {
@@ -97,7 +106,6 @@ public class MountainService {
                 }
                 params.put("initial", initial);
             }
-
             return mountainDAO.countByCondition(params);
         }
 }
