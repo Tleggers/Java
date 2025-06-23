@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+"file:///C:/Users/Gates/git/Java/Trekkit_Java/src/main/resources/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.Trekkit_Java.DAO.AuthCodeDao"> 
 
 	<delete id="deleteEmail">
-    	DELETE FROM authcode WHERE email = #{cleanEmail}
+    	Delete from authcode where email = #{email}
     </delete>
     
-    <insert id="insertAuthCode">
+    <insert id="insertAuthCode" parameterType="com.Trekkit_Java.DTO.AuthCode">
         INSERT INTO authcode (email, code)
-        VALUES (#{cleanEmail}, #{authCode})
+        VALUES (#{email}, #{authCode})
     </insert>
     
     <delete id="deleteExpiredCodes">
-    	DELETE FROM authcode WHERE created &lt; NOW() - INTERVAL 10 MINUTE
+    	Delete from authcode where created &lt; NOW() - INTERVAL 3 MINUTE
     </delete>
     
-    <select id="verifyCode" resultType="int">
-        SELECT COUNT(*) FROM authcode 
-        WHERE email = #{cleanEmail} AND code = #{authcode} AND created >= NOW() - INTERVAL 10 MINUTE
+    <select id="verifyCode" resultType="_int">
+        SELECT Count(*) FROM authcode WHERE email=#{email} and code=#{code} AND created >= NOW() - INTERVAL 3 MINUTE
     </select>
     
 </mapper>

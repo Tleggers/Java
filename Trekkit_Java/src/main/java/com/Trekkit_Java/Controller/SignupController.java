@@ -45,7 +45,7 @@ public class SignupController {
 	        boolean isValid = val.dateValidate(cuserid, cpassword, cemail, cnickname);
 	        
 	        if (!isValid) {
-	            return ResponseEntity.ok(false); // ❌ 정규식 실패
+	            return ResponseEntity.ok(false); // 정규식 실패
 	        }
 	        
 	        if(cnickname == null || cnickname.equals("")) {
@@ -77,11 +77,11 @@ public class SignupController {
 	        // 회원가입 처리
 	        boolean success = ss.dosignup(cuserid, cpassword, cemail, cnickname, imageUrl);
 
-	        return ResponseEntity.ok(success); // ✅ true 또는 false 응답
+	        return ResponseEntity.ok(success); // true 또는 false 응답
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	        return ResponseEntity.status(500).body(false); // ❌ 서버 에러 시 false
+	        return ResponseEntity.status(500).body(false); // 서버 에러 시 false
 	    }
 	}
 	

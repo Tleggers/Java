@@ -27,10 +27,7 @@ import com.Trekkit_Java.Service.LoginService;
 import com.Trekkit_Java.Util.JwtUtil;
 
 import jakarta.servlet.http.HttpServletResponse;
-
-// 2025-06-05 해야하는 일
-// 1. 소셜 로그인 구현
-
+	
 @RestController
 @RequestMapping("/login")
 public class LoginController {
