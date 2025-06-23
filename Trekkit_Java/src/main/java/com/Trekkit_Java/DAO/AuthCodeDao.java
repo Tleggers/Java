@@ -1,6 +1,5 @@
 package com.Trekkit_Java.DAO;
 
-import org.apache.ibatis.annotations.Delete; // @Delete 어노테이션을 import 합니다.
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
