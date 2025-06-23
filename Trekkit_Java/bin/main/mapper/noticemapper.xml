@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "file:///C:\Users\805-06\Desktop\TP\5\Java\Trekkit_Java\src\main\resources\dtd\mybatis-3-mapper.dtd">
 
 <mapper namespace="com.Trekkit_Java.DAO.NoticeDAO">
 
     <resultMap id="NoticeResultMap" type="com.Trekkit_Java.DTO.NoticeDTO">
-        <id property="noticeId" column="notice_id"/>
-        <result property="userId" column="user_id"/>
-        <result property="nickname" column="nickname"/> <!-- 닉네임 필드 매핑 추가 -->
+        <id property="id" column="id"/> <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
         <result property="title" column="title"/>
         <result property="content" column="content"/>
         <result property="category" column="category"/>
@@ -16,12 +15,10 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <!-- 모든 공지사항 목록 조회 (페이징) -->
     <select id="selectAllNotices" resultMap="NoticeResultMap">
         SELECT
-            n.notice_id,
-            n.user_id,
-            COALESCE(u.nickname, '탈퇴한 회원') as nickname, -- user_id가 NULL일 경우 '탈퇴한 회원'으로 표시
+            n.id, n.user_id,
+            COALESCE(u.nickname, '탈퇴한 회원') as nickname,
             n.title,
             n.content,
             n.category,
@@ -34,12 +31,10 @@
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <!-- 카테고리별 공지사항 목록 조회 (페이징) - (프론트에서 카테고리 기능 제거되었지만, DAO는 유지) -->
     <select id="selectNoticesByCategory" resultMap="NoticeResultMap">
         SELECT
-            n.notice_id,
-            n.user_id,
-            COALESCE(u.nickname, '탈퇴한 회원') as nickname, -- user_id가 NULL일 경우 '탈퇴한 회원'으로 표시
+            n.id, n.user_id,
+            COALESCE(u.nickname, '탈퇴한 회원') as nickname,
             n.title,
             n.content,
             n.category,
@@ -53,23 +48,19 @@
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <!-- 공지사항 총 개수 조회 (getNotices()에서 사용) -->
     <select id="getTotalNoticeCount" resultType="int">
         SELECT COUNT(*) FROM notices
     </select>
     
-    <!-- 카테고리별 공지사항 개수 조회 (프론트에서 카테고리 기능 제거되었지만, DAO는 유지) -->
     <select id="selectCountByCategory" resultType="int">
         SELECT COUNT(*) FROM notices
         WHERE category = #{category}
     </select>
 
-    <!-- 공지사항 상세 조회 -->
     <select id="selectNoticeById" resultMap="NoticeResultMap">
         SELECT
-            n.notice_id,
-            n.user_id,
-            COALESCE(u.nickname, '탈퇴한 회원') as nickname, -- user_id가 NULL일 경우 '탈퇴한 회원'으로 표시
+            n.id, n.user_id,
+            COALESCE(u.nickname, '탈퇴한 회원') as nickname,
             n.title,
             n.content,
             n.category,
@@ -78,36 +69,28 @@
             n.updated_at
         FROM notices n
         LEFT JOIN user u ON n.user_id = u.id
-        WHERE n.notice_id = #{noticeId}
-    </select>
+        WHERE n.id = #{id} </select>
     
     <update id="increaseViewCount">
         UPDATE notices
         SET view_count = view_count + 1
-        WHERE notice_id = #{noticeId}
-    </update>
+        WHERE id = #{id} </update>
 
-    <!-- 새 공지사항 작성 -->
     <insert id="insertNotice" parameterType="com.Trekkit_Java.DTO.NoticeDTO" 
-            useGeneratedKeys="true" keyProperty="noticeId">
-        INSERT INTO notices (user_id, title, content, category, created_at, updated_at)
+            useGeneratedKeys="true" keyProperty="id"> INSERT INTO notices (user_id, title, content, category, created_at, updated_at)
         VALUES (#{userId}, #{title}, #{content}, #{category}, #{createdAt}, #{updatedAt})
     </insert>
 
-    <!-- 공지사항 수정 -->
     <update id="updateNotice" parameterType="com.Trekkit_Java.DTO.NoticeDTO">
         UPDATE notices
         SET title = #{title},
             content = #{content},
             category = #{category},
             updated_at = #{updatedAt}
-        WHERE notice_id = #{noticeId}
-    </update>
+        WHERE id = #{id} </update>
 
-    <!-- 공지사항 삭제 -->
     <delete id="deleteNotice">
         DELETE FROM notices
-        WHERE notice_id = #{noticeId}
-    </delete>
+        WHERE id = #{id} </delete>
 
 </mapper>

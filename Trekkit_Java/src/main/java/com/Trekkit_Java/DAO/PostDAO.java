@@ -3,6 +3,8 @@ package com.Trekkit_Java.DAO;
 import com.Trekkit_Java.DTO.PostDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +34,6 @@ public interface PostDAO {
     void addBookmark(@Param("postId") Long postId, @Param("userId") Long userId);
     void deleteBookmark(@Param("postId") Long postId, @Param("userId") Long userId);
     int findBookmarkByPostIdAndUserId(@Param("postId") Long postId, @Param("userId") Long userId);
+    @Select("SELECT name FROM mountain ORDER BY name ASC")
+    List<String> findAllMountainNames();
 }

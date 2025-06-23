@@ -71,8 +71,7 @@ public class NoticeController {
         }
     }
 
-    // 기존 @PostMapping (공지사항 생성)은 그대로 유지합니다.
-    @PostMapping // HTTP POST 요청을 처리합니다. (기존 공지사항 생성 로직)
+    @PostMapping
     public ResponseEntity<String> createNotice(@RequestBody NoticeDTO noticeDTO, HttpServletRequest request) {
         try {
             int adminUserId = getAdminUserIdFromRequest(request);
@@ -98,12 +97,14 @@ public class NoticeController {
             if (existingNotice == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("공지사항을 찾을 수 없습니다.");
             }
+            // 기존 userId가 null이 아니고, 현재 관리자 ID와 일치하지 않으면 권한 없음
+            // DTO의 ID 필드가 noticeId에서 id로 변경되었으므로, getter도 getId()로 변경
             if (existingNotice.getUserId() != null && existingNotice.getUserId() != adminUserId) {
                 throw new SecurityException("공지사항 수정 권한이 없습니다: 작성자 불일치.");
             }
 
-            noticeDTO.setNoticeId(id);
-            noticeDTO.setUserId(existingNotice.getUserId());
+            noticeDTO.setId(id); // setNoticeId -> setId
+            noticeDTO.setUserId(existingNotice.getUserId()); // 유지
 
             noticeService.updateNotice(noticeDTO);
             return ResponseEntity.ok("공지사항이 성공적으로 수정되었습니다.");
@@ -125,6 +126,7 @@ public class NoticeController {
             if (existingNotice == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("공지사항을 찾을 수 없습니다.");
             }
+            // DTO의 ID 필드가 noticeId에서 id로 변경되었으므로, getter도 getId()로 변경
             if (existingNotice.getUserId() != null && existingNotice.getUserId() != adminUserId) {
                 throw new SecurityException("공지사항 삭제 권한이 없습니다: 작성자 불일치.");
             }
