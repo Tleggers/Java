@@ -6,7 +6,7 @@
 <mapper namespace="com.Trekkit_Java.DAO.MountainImageDAO">
 <select id="findByRegion" resultType="com.Trekkit_Java.DTO.MountainImageDTO" parameterType="string">
     SELECT 
-      id, name, region, latitude, longitude, image_url 
+      id, name, region, location, height, tip, warning, latitude, longitude, image_url 
     FROM 
       mountain_image 
     WHERE 
