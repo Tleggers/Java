@@ -5,19 +5,29 @@ import com.Trekkit_Java.DTO.PostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile; // MultipartFile 추가
 
+import java.util.ArrayList; // ArrayList 추가
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.io.File; // 파일 처리
+import java.nio.file.Files; // 파일 복사
+import java.nio.file.Path; // 경로
+import java.nio.file.Paths; // 경로
+import java.util.UUID; // 고유 ID 생성
+import org.springframework.beans.factory.annotation.Value; // @Value 추가
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostDAO postDAO;
+    
+    @Value("${file.upload.path}")
+    private String uploadPath;
 
-    // ... 기존 createPost, getPostById, getAllPosts, updatePost, deletePost 메소드는 동일 ...
     @Transactional
     public PostDTO createPost(PostDTO postDTO, Long userId) {
         postDTO.setUserId(userId);
@@ -29,6 +39,32 @@ public class PostService {
             }
         }
         return postDTO;
+    }
+    
+    @Transactional
+    public List<String> uploadPostImages(MultipartFile[] files) throws Exception {
+        List<String> imagePaths = new ArrayList<>();
+        // 업로드 디렉토리가 없으면 생성
+        // --- 여기서 uploadPath 변수를 사용합니다 ---
+        File uploadDir = new File(uploadPath); // uploadPath가 이제 올바르게 인식됩니다.
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs(); // 디렉토리 생성
+        }
+
+        for (MultipartFile file : files) {
+            if (!file.isEmpty()) {
+                String originalFilename = file.getOriginalFilename();
+                String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String uuid = UUID.randomUUID().toString();
+                String newFilename = uuid + fileExtension;
+                Path filePath = Paths.get(uploadPath, newFilename); // uploadPath가 이제 올바르게 인식됩니다.
+
+                Files.copy(file.getInputStream(), filePath);
+                // 저장된 파일의 URL 경로를 반환 (예: /uploads/abc-def.jpg)
+                imagePaths.add("/uploads/" + newFilename);
+            }
+        }
+        return imagePaths;
     }
 
     @Transactional
@@ -128,5 +164,10 @@ public class PostService {
             isBookmarked = true;
         }
         return isBookmarked;
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getAllMountainNames() {
+        return postDAO.findAllMountainNames();
     }
 }

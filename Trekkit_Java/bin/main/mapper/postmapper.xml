@@ -4,41 +4,61 @@
 
 <mapper namespace="com.Trekkit_Java.DAO.PostDAO">
 
-    <resultMap id="PostResultMap" type="com.Trekkit_Java.DTO.PostDTO">
-        <id property="id" column="id"/>
-        <result property="userId" column="user_id"/>
-        <result property="nickname" column="nickname"/>
-        <result property="userLoginId" column="user_login_id"/> <result property="title" column="title"/>
-        <result property="mountain" column="mountain"/>
-        <result property="content" column="content"/>
-        <result property="viewCount" column="view_count"/>
-        <result property="likeCount" column="like_count"/>
-        <result property="commentCount" column="comment_count"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
-        </resultMap>
+<resultMap id="postDTOMap" type="com.Trekkit_Java.DTO.PostDTO">
+    <id property="id" column="id"/>
+    <result property="userId" column="user_id"/>
+    <result property="nickname" column="nickname"/>
+    <result property="userLoginId" column="user_login_id"/>
+    <result property="title" column="title"/>
+    <result property="content" column="content"/>
+    <result property="mountain" column="mountain"/>
+    <result property="viewCount" column="view_count"/>
+    <result property="likeCount" column="like_count"/>
+    <result property="commentCount" column="comment_count"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+</resultMap>
 
-    <select id="findAll" resultMap="PostResultMap">
-        SELECT
-            p.id, p.user_id, u.nickname, u.userid AS user_login_id,
-            p.title, p.mountain, p.content, p.view_count, p.like_count, p.comment_count, p.created_at
-        FROM posts p
-        JOIN user u ON p.user_id = u.id
-        <where>
-            <if test="mountain != null and mountain != ''">
-                AND p.mountain = #{mountain}
-            </if>
-        </where>
-        <choose>
-            <when test="sort == '인기순'">
-                ORDER BY p.like_count DESC, p.created_at DESC
-            </when>
-            <otherwise>
-                ORDER BY p.created_at DESC
-            </otherwise>
-        </choose>
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
+<select id="findById" resultMap="postDTOMap">
+    SELECT
+        p.id,                  -- post_id 대신 id 사용 (resultMap의 column="id"와 매칭)
+        p.user_id,
+        u.nickname,
+        u.userid AS user_login_id, -- user_login_id_from_user_table 대신 user_login_id 사용 (resultMap과 매칭)
+        p.title,
+        p.content,
+        p.mountain,
+        p.view_count,
+        p.like_count,
+        p.comment_count,
+        p.created_at,
+        p.updated_at
+    FROM posts p
+    JOIN user u ON p.user_id = u.id
+    WHERE p.id = #{postId}
+</select>
+
+<select id="findAll" resultMap="postDTOMap">
+    SELECT
+        p.id, p.user_id, u.nickname, u.userid AS user_login_id,
+        p.title, p.mountain, p.content, p.view_count, p.like_count, p.comment_count, p.created_at
+    FROM posts p
+    JOIN user u ON p.user_id = u.id
+    <where>
+        <if test="mountain != null and mountain != ''">
+            AND p.mountain = #{mountain}
+        </if>
+    </where>
+    <choose>
+        <when test="sort == '인기순'">
+            ORDER BY p.like_count DESC, p.created_at DESC
+        </when>
+        <otherwise>
+            ORDER BY p.created_at DESC
+        </otherwise>
+    </choose>
+    LIMIT #{limit} OFFSET #{offset}
+</select>
 
     <select id="count" resultType="int">
         SELECT COUNT(*) FROM posts
@@ -47,16 +67,6 @@
                 AND mountain = #{mountain}
             </if>
         </where>
-    </select>
-
-    <select id="findById" resultMap="PostResultMap">
-        SELECT
-            p.id, p.user_id, u.nickname, u.userid AS user_login_id,
-            p.title, p.content, p.mountain,
-            p.view_count, p.like_count, p.comment_count, p.created_at, p.updated_at
-        FROM posts p
-        JOIN user u ON p.user_id = u.id
-        WHERE p.id = #{postId}
     </select>
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
