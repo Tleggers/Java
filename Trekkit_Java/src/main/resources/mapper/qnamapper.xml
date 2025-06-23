@@ -1,32 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "file:///C:\Users\805-06\Desktop\TP\5\Java\Trekkit_Java\src\main\resources\dtd\mybatis-3-mapper.dtd">
 <mapper namespace="com.Trekkit_Java.DAO.QnaDAO">
 
-    <!-- Q&A 질문 관련 쿼리 -->
-    <select id="getAllQuestions" resultType="com.Trekkit_Java.DTO.QnaQuestionDTO">
+    <resultMap id="QnaQuestionResultMap" type="com.Trekkit_Java.DTO.QnaQuestionDTO">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="mountain" column="mountain"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="answerCount" column="answer_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="isSolved" column="is_solved"/>
+        <result property="acceptedAnswerId" column="accepted_answer_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="QnaAnswerResultMap" type="com.Trekkit_Java.DTO.QnaAnswerDTO">
+        <id property="id" column="id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="userLoginId" column="user_login_id"/> <result property="content" column="content"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="isAccepted" column="is_accepted"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+
+    <select id="getAllQuestions" resultMap="QnaQuestionResultMap">
         SELECT
-            id, user_id as userId, nickname, title, content, mountain,
-            view_count as viewCount, answer_count as answerCount, like_count as likeCount,
-            is_solved as isSolved, accepted_answer_id as acceptedAnswerId,
-            created_at as createdAt, updated_at as updatedAt
-        FROM qna_questions
-        ORDER BY created_at DESC
+            qq.id,
+            qq.user_id,
+            u.nickname,
+            qq.title,
+            qq.content,
+            qq.mountain,
+            qq.view_count,
+            qq.answer_count,
+            qq.like_count,
+            qq.is_solved,
+            qq.accepted_answer_id,
+            qq.created_at,
+            qq.updated_at
+        FROM qna_questions qq
+        JOIN user u ON qq.user_id = u.id
+        ORDER BY qq.created_at DESC
     </select>
 
-    <select id="getQuestionById" resultType="com.Trekkit_Java.DTO.QnaQuestionDTO">
+    <select id="getQuestionById" resultMap="QnaQuestionResultMap">
         SELECT
-            id, user_id as userId, nickname, title, content, mountain,
-            view_count as viewCount, answer_count as answerCount, like_count as likeCount,
-            is_solved as isSolved, accepted_answer_id as acceptedAnswerId,
-            created_at as createdAt, updated_at as updatedAt
-        FROM qna_questions
-        WHERE id = #{id}
+            qq.id,
+            qq.user_id,
+            u.nickname,
+            qq.title,
+            qq.content,
+            qq.mountain,
+            qq.view_count,
+            qq.answer_count,
+            qq.like_count,
+            qq.is_solved,
+            qq.accepted_answer_id,
+            qq.created_at,
+            qq.updated_at
+        FROM qna_questions qq
+        JOIN user u ON qq.user_id = u.id
+        WHERE qq.id = #{id}
     </select>
 
     <insert id="insertQuestion" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO qna_questions (user_id, nickname, title, content, mountain, created_at, updated_at)
-        VALUES (#{userId}, #{nickname}, #{title}, #{content}, #{mountain}, #{createdAt}, #{updatedAt})
+        INSERT INTO qna_questions (user_id, title, content, mountain, created_at, updated_at)
+        VALUES (#{userId}, #{title}, #{content}, #{mountain}, #{createdAt}, #{updatedAt})
     </insert>
 
     <update id="updateQuestion">
@@ -70,29 +118,42 @@
         WHERE id = #{questionId}
     </update>
 
-    <!-- Q&A 답변 관련 쿼리 -->
-    <select id="getAnswersByQuestionId" resultType="com.Trekkit_Java.DTO.QnaAnswerDTO">
+    <select id="getAnswersByQuestionId" resultMap="QnaAnswerResultMap">
         SELECT
-            id, question_id as questionId, user_id as userId, nickname, content,
-            like_count as likeCount, is_accepted as isAccepted,
-            created_at as createdAt, updated_at as updatedAt
-        FROM qna_answers
-        WHERE question_id = #{questionId}
-        ORDER BY created_at ASC
+            qa.id,
+            qa.question_id,
+            qa.user_id,
+            u.nickname,
+            u.userid AS user_login_id, qa.content,
+            qa.like_count,
+            qa.is_accepted,
+            qa.created_at,
+            qa.updated_at
+        FROM qna_answers qa
+        JOIN user u ON qa.user_id = u.id
+        WHERE qa.question_id = #{questionId}
+        ORDER BY qa.created_at ASC
     </select>
 
-    <select id="getAnswerById" resultType="com.Trekkit_Java.DTO.QnaAnswerDTO">
+    <select id="getAnswerById" resultMap="QnaAnswerResultMap">
         SELECT
-            id, question_id as questionId, user_id as userId, nickname, content,
-            like_count as likeCount, is_accepted as isAccepted,
-            created_at as createdAt, updated_at as updatedAt
-        FROM qna_answers
-        WHERE id = #{id}
+            qa.id,
+            qa.question_id,
+            qa.user_id,
+            u.nickname,
+            u.userid AS user_login_id, qa.content,
+            qa.like_count,
+            qa.is_accepted,
+            qa.created_at,
+            qa.updated_at
+        FROM qna_answers qa
+        JOIN user u ON qa.user_id = u.id
+        WHERE qa.id = #{id}
     </select>
 
     <insert id="insertAnswer" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO qna_answers (question_id, user_id, nickname, content, created_at, updated_at)
-        VALUES (#{questionId}, #{userId}, #{nickname}, #{content}, #{createdAt}, #{updatedAt})
+        INSERT INTO qna_answers (question_id, user_id, content, created_at, updated_at)
+        VALUES (#{questionId}, #{userId}, #{content}, #{createdAt}, #{updatedAt})
     </insert>
 
     <update id="updateAnswer">
@@ -114,10 +175,6 @@
         WHERE id = #{answerId}
     </update>
 
-    <!-- Q&A 이미지 관련 쿼리 (모두 제거) -->
-
-
-    <!-- Q&A 질문 좋아요 관련 쿼리 -->
     <insert id="insertQuestionLike">
         INSERT INTO qna_question_likes (question_id, user_id, created_at)
         VALUES (#{questionId}, #{userId}, #{createdAt})
@@ -152,7 +209,6 @@
         WHERE id = #{questionId}
     </update>
 
-    <!-- Q&A 답변 좋아요 관련 쿼리 -->
     <insert id="insertAnswerLike">
         INSERT INTO qna_answer_likes (answer_id, user_id, created_at)
         VALUES (#{answerId}, #{userId}, #{createdAt})
