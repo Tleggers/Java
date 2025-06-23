@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Trekkit_Java.DAO.MountainBookmarkDAO">
+
+    <insert id="insertBookmark">
+        INSERT IGNORE INTO mt_bookmark (userid, mountain_id)
+        VALUES (#{userid}, #{mountainId})
+    </insert>
+
+    <delete id="deleteBookmark">
+        DELETE FROM mt_bookmark
+        WHERE userid = #{userid} AND mountain_id = #{mountainId}
+    </delete>
+
+    <select id="existsBookmark" resultType="int">
+        SELECT COUNT(*) FROM mt_bookmark
+        WHERE userid = #{userid} AND mountain_id = #{mountainId}
+    </select>
+
+    <select id="selectBookmarksByUser" resultType="com.Trekkit_Java.Model.Mountain">
+        SELECT m.* FROM mt_bookmark b
+        JOIN mountain m ON b.mountain_id = m.id
+        WHERE b.userid = #{userid}
+    </select>
+
+</mapper>

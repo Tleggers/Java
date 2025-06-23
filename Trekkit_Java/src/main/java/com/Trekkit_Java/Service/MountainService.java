@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.Trekkit_Java.DAO.MountainDAO;
+import com.Trekkit_Java.DTO.MountainDTO;
 import com.Trekkit_Java.Model.Mountain;
 
 @Service
 public class MountainService {
-
 	@Autowired
 	private MountainDAO mountainDAO;
 	
@@ -26,13 +26,14 @@ public class MountainService {
 	    return mountainDAO.selectAll(params);
 	}
 
-    public List<Mountain> filteredMountains(int page, int size, String search, String location, String initial) {
+    public List<Mountain> filteredMountains(int page, int size, String search, String location, String initial, String orderBy) {
         int offset = (page - 1) * size;
         
 	      Map<String, Object> params = new HashMap<>();
 	      params.put("offset", offset);
 	      params.put("size", size);
 	      params.put("search", search);
+	      params.put("orderBy", orderBy);
 	
 	      if (location != null && !location.trim().isEmpty()) {
 	    	  params.put("location", location);

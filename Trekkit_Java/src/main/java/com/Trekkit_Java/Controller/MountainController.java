@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Trekkit_Java.DAO.MountainDAO;
+import com.Trekkit_Java.DTO.MountainDTO;
 import com.Trekkit_Java.Model.Mountain;
 import com.Trekkit_Java.Service.MountainService;
 
@@ -28,10 +31,18 @@ public class MountainController {
         String search = (String) request.get("search") != null ? request.get("search").toString() : "";
         String location = request.get("location") != null ? request.get("location").toString() : "";
         String initial = request.get("initial") != null ? request.get("initial").toString() : "";
+        String sort = request.get("sort") != null ? request.get("sort").toString() : "";
+        String orderBy;
+        if ("asc".equals(sort)) {
+            orderBy = "mntihigh ASC";
+        } else if ("desc".equals(sort)) {
+            orderBy = "mntihigh DESC";
+        } else {
+            orderBy = "mntiname ASC";
+        }
 
-        List<Mountain> data = mountainService.filteredMountains(page, size, search, location, initial);
+        List<Mountain> data = mountainService.filteredMountains(page, size, search, location, initial, orderBy);
         int totalCount = mountainService.countByInitial(location, search, initial);
-
         int totalPages = (int) Math.ceil((double) totalCount / size);
 
         Map<String, Object> result = new HashMap<>();
