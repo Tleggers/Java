@@ -40,7 +40,7 @@ public class LoginController {
 	public ResponseEntity<?> doLogin(@RequestBody Map<String, String> req,
 	                                 @RequestHeader(value = "X-Client-Type", required = false) String clientType) {
 	    try {
-	    	
+
 	        String userid = req.get("userid").trim();
 	        String password = req.get("password").trim();
 
@@ -52,7 +52,7 @@ public class LoginController {
 
 	        // 로그인 시도
 	        Map<String, Object> result = ls.doLogin(userid, password, clientType);
-
+	        
 	        if (result != null) {
 	        	
 	            String token = (String) result.get("token");

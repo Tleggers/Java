@@ -82,6 +82,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/apis.data.go.kr/**", config);
         source.registerCorsConfiguration("/theme/**", config);
         source.registerCorsConfiguration("/hiking-course", config);
+        source.registerCorsConfiguration("/pay/**", config); // 결제
 
         // 구글
         source.registerCorsConfiguration("/oauth2/**", config);

@@ -47,6 +47,7 @@ public class LoginService {
             result.put("nickname", user.getNickname());
             result.put("logintype", user.getLogintype());
             result.put("index", user.getId());
+            result.put("point", user.getPoint());
             
             if(user.getProfile() == null) {
             	result.put("profile", ""); 
@@ -96,6 +97,7 @@ public class LoginService {
 	        result.put("nickname", user.getNickname());
 	        result.put("logintype", user.getLogintype());
 	        result.put("index", user.getId());
+	        result.put("point", user.getPoint());
 
 	        if (user.getProfile() == null || user.getProfile().isEmpty()) {
 	            result.put("profile", ""); 
