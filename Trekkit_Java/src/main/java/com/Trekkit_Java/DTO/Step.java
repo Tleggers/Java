@@ -14,5 +14,5 @@ public class Step {
     private Date created;
     private Date updated;
     private java.sql.Date walkDate;
-
+    private boolean rewarded;
 }

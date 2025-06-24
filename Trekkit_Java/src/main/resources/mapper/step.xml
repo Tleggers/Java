@@ -5,25 +5,22 @@
 
 <mapper namespace="com.Trekkit_Java.DAO.StepDAO">
 
- <!-- 일별 INSERT OR UPDATE -->
-    <insert id="insertOrUpdateStep" parameterType="Step">
-        INSERT INTO step (user_id, walk_date, distance)
-        VALUES (#{userId}, #{walkDate}, #{distance})
-        ON DUPLICATE KEY UPDATE distance = #{distance}, updated = NOW()
-    </insert>
+<insert id="insertOrUpdateStep" parameterType="Step">
+    INSERT INTO step (user_id, walk_date, distance, rewarded)
+    VALUES (#{userId}, #{walkDate}, #{distance}, #{rewarded})
+    ON DUPLICATE KEY UPDATE 
+    distance = #{distance},
+    updated = NOW()
+</insert>
 
-    <!-- 월별 INSERT OR UPDATE -->
-    <insert id="insertOrUpdateMonthly" parameterType="StepMonthly">
-        INSERT INTO step_monthly (user_id, month, total_distance)
-        VALUES (#{userId}, #{month}, #{totalDistance})
-        ON DUPLICATE KEY UPDATE total_distance = #{totalDistance}, updated = NOW()
-    </insert>
+<update id="markRewarded">
+    UPDATE step
+    SET rewarded = TRUE, updated = NOW()
+    WHERE user_id = #{userId} AND walk_date = #{walkDate}
+</update>
 
-    <select id="selectStepByUserIdAndDate" resultType="Step">
-        SELECT * FROM step WHERE user_id = #{userId} AND walk_date = #{walkDate}
-    </select>
+<select id="selectStepByUserIdAndDate" resultType="Step">
+	SELECT * FROM step WHERE user_id = #{userId} AND walk_date = #{walkDate}
+</select>
 
-    <select id="selectMonthlyByUserIdAndMonth" resultType="StepMonthly">
-        SELECT * FROM step_monthly WHERE user_id = #{userId} AND month = #{month}
-    </select>
 </mapper>

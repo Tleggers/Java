@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Trekkit_Java.DTO.Step;
-import com.Trekkit_Java.DTO.StepMonthly;
 import com.Trekkit_Java.Service.StepService;
 
 @RestController
@@ -29,25 +28,11 @@ public class StepController {
         return ResponseEntity.ok("일별 걸음수 저장 완료");
     }
 
-    // 🔹 월별 누적 저장
-    @PostMapping("/saveMonthly")
-    public ResponseEntity<String> saveMonthly(@RequestBody StepMonthly monthly) {
-        stepService.saveMonthlyStep(monthly);
-        return ResponseEntity.ok("월별 걸음수 저장 완료");
-    }
-
     // 🔹 특정 날짜 걸음수 조회
     @GetMapping("/daily")
     public Step getDaily(@RequestParam("userId") int userId,
             				@RequestParam("walkDate") String walkDate) {
         return stepService.getDailyStep(userId, Date.valueOf(walkDate));
-    }
-
-    // 🔹 특정 월 누적 조회
-    @GetMapping("/monthly")
-    public StepMonthly getMonthly(@RequestParam("userId") int userId,
-            							@RequestParam("month") String month) {
-        return stepService.getMonthlyStep(userId, month);
     }
 } 
 
