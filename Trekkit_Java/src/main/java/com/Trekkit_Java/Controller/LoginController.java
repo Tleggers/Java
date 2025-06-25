@@ -166,6 +166,7 @@ public class LoginController {
 
 	        // 데이터 리턴하는 곳
 	        result.put("id", user.getUserid());
+	        result.put("idx", user.getId());
 	        result.put("nickname", user.getNickname());
 	        result.put("profile", user.getProfile());
 	        result.put("logintype", user.getLogintype());
