@@ -1,6 +1,7 @@
 package com.Trekkit_Java.Controller;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,13 @@ public class StepController {
     public Step getDaily(@RequestParam("userId") int userId,
             				@RequestParam("walkDate") String walkDate) {
         return stepService.getDailyStep(userId, Date.valueOf(walkDate));
+    }
+    
+    // 어제 걸음 수 조회
+    @GetMapping("/yesterday")
+    public Step getYesterdayStep(@RequestParam int userId) {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        return stepService.getDailyStep(userId, Date.valueOf(yesterday));
     }
 } 
 
