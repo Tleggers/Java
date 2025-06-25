@@ -19,20 +19,20 @@ public class MountainCourseController {
 	        this.Mcourse = Mcourse;
 	    }
 
-	    @GetMapping("/findByName")
-	    public ResponseEntity<?> findByName(@RequestParam("name") String name) {
+	    @GetMapping("/findByNameAndLocation")
+	    public ResponseEntity<?> findByName(@RequestParam("name") String name, @RequestParam("location") String location) {
 	    	// ✅ 디버깅용 로그 출력
-	        System.out.println("💡 받은 name 파라미터: " + name);
+	    	 System.out.println("💡 받은 name: " + name + ", location: " + location);
 	        
-	        MountainCourse course = Mcourse.findByMountainName(name);
+	    	 MountainCourse course = Mcourse.findByNameAndLocation(name, location);
 
-	        if (course == null) {
-	            System.out.println("❗ DB에서 해당 산 찾지 못함: " + name);
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-	                    .body("산 정보를 찾을 수 없습니다.");
-	        }
+	    	 if (course == null) {
+	    	        System.out.println("❗ DB에서 해당 산을 찾지 못함");
+	    	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	    	                .body("산 정보를 찾을 수 없습니다.");
+	    	    }
 
-	        System.out.println("✅ DB에서 매칭된 산 정보: " + course.getMountainName());
-	        return ResponseEntity.ok(course);
-	    }
+	    	    System.out.println("✅ DB 매칭 성공: " + course.getMountainName());
+	    	    return ResponseEntity.ok(course);
+	    	}
 }

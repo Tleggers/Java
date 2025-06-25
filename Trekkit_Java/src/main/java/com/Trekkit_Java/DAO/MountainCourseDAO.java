@@ -7,5 +7,8 @@ import com.Trekkit_Java.DTO.MountainCourse;
 
 @Mapper
 public interface MountainCourseDAO {
-	MountainCourse findByMountainName(@Param("name") String name);
+	MountainCourse findByNameAndLocation(
+		    @Param("name") String name,
+		    @Param("location") String location
+	);
 }

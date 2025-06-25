@@ -4,7 +4,7 @@
 "file:///C:/Users/Gates/git/Java/Trekkit_Java/src/main/resources/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.Trekkit_Java.DAO.MountainCourseDAO">
-<select id="findByMountainName" resultType="com.Trekkit_Java.DTO.MountainCourse">
+<select id="findByNameAndLocation" resultType="com.Trekkit_Java.DTO.MountainCourse">
     SELECT 
       mountain_name AS mountainName,
       mountain_location AS mountainLocation,
@@ -16,6 +16,7 @@
       latitude,
       longitude
     FROM mountain_course
-    WHERE mountain_name = #{name}
+    WHERE mountain_name = #{name}  
+    AND #{location} LIKE CONCAT(mountain_location, '%')
   </select>
 </mapper>
