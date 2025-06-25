@@ -20,4 +20,12 @@ public class PayService {
         
 	}
 
+	public int usePoint(Long userid, int point) {
+		
+	    // return payDao.usePoint(userid, point); // 실제 차감 처리
+	    // 포인트 부족한지 확인하거나 예외처리는 여기서도 가능
+	    return pd.usePoint(userid, point);
+	}
+
+
 }
