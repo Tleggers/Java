@@ -130,6 +130,7 @@ public class PostController {
         // System.out.println("PostController: getPosts Debug: 현재 userId (인증된 경우): " + debugUserId);
 
         // PostService를 통해 필터링 및 정렬된 게시글 목록을 가져옵니다.
+    	System.out.println("게시글 조회");
         Map<String, Object> response = postService.getAllPosts(page, size, sort, mountain);
         return ResponseEntity.ok(response); // HTTP 200 OK 상태 코드와 함께 응답 데이터를 반환합니다.
     }
